@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 
 import { getDisplayName } from './internal/react-nodes'
 import { AllPagePropsContext } from './context'
-import { useLayoutProps } from './hooks'
+import { useAllLayoutProps } from './hooks'
 
 import type { AllPagePropsValue, AnyComponent } from './context'
 
@@ -46,11 +46,17 @@ export function withLayouts<
   const pageDisplayName = getDisplayName(Page)
 
   const WithLayoutsPage: React.FC<PropsOf<C>> = (pageProps) => {
-    const allPageProps = useLayoutProps()
+    const allPageProps = useAllLayoutProps()
 
     let children = <Page {...pageProps} />
 
-    for (const Layout of Layouts) {
+    for (let index = 0; index < Layouts.length; index++) {
+      const Layout = Layouts[index]
+
+      if (!Layout.displayName) {
+        Layout.displayName = `Layout${index + 1}_${pageDisplayName}`
+      }
+
       children = <Layout>{children}</Layout>
     }
 

@@ -2,7 +2,7 @@ import React from 'react'
 import TestRenderer from 'react-test-renderer'
 import { act } from 'react-test-renderer'
 
-import { useLayoutProps } from '../hooks'
+import { useAllLayoutProps, useLayoutProps } from '../hooks'
 import { withLayouts } from '../with-layouts'
 
 describe('withLayouts', () => {
@@ -30,7 +30,7 @@ describe('withLayouts', () => {
     expect(page.children.join('')).toBe('page')
   })
 
-  it('does not mutate anonymous layout displayName during render', () => {
+  it('assigns displayName for anonymous layout during render', () => {
     const Page: React.FC = () => null
 
     const AnonymousLayout: React.FC<React.PropsWithChildren> = ({ children }) => <>{children}</>
@@ -41,7 +41,7 @@ describe('withLayouts', () => {
       TestRenderer.create(<Wrapped />)
     })
 
-    expect(AnonymousLayout.displayName).toBeUndefined()
+    expect(AnonymousLayout.displayName).toBe('Layout1_Page')
   })
 
   it('hoists selected static properties', () => {
@@ -64,7 +64,7 @@ describe('withLayouts', () => {
 
     const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       const props = useLayoutProps(Page)
-      return <div data-title={props.title}>{children}</div>
+      return <div data-title={props?.title}>{children}</div>
     }
 
     const Wrapped = withLayouts(Page, [Layout])
@@ -77,7 +77,7 @@ describe('withLayouts', () => {
     expect(node).toBeTruthy()
   })
 
-  it('useLayoutProps() returns all component props map', () => {
+  it('useAllLayoutProps() returns all component props map', () => {
     interface PageProps {
       count: number
     }
@@ -85,7 +85,7 @@ describe('withLayouts', () => {
     const Page: React.FC<PageProps> = ({ count }) => <span>{count}</span>
 
     const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
-      const allLayoutProps = useLayoutProps()
+      const allLayoutProps = useAllLayoutProps()
       const pageProps = allLayoutProps.get(Page) as PageProps | undefined
       return (
         <div data-has-page={String(allLayoutProps.has(Page))} data-count={String(pageProps?.count)}>
@@ -104,7 +104,29 @@ describe('withLayouts', () => {
     expect(node).toBeTruthy()
   })
 
-  it('throws when target component props are missing', () => {
+  it('useLayoutProps() returns last component props when called without arguments', () => {
+    interface PageProps {
+      id: string
+    }
+
+    const Page: React.FC<PageProps> = ({ id }) => <span>{id}</span>
+
+    const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
+      const props = useLayoutProps<PageProps>()
+      return <div data-id={props?.id}>{children}</div>
+    }
+
+    const Wrapped = withLayouts(Page, [Layout])
+    let renderer!: TestRenderer.ReactTestRenderer
+    act(() => {
+      renderer = TestRenderer.create(<Wrapped id='abc' />)
+    })
+
+    const node = renderer.root.findByProps({ 'data-id': 'abc' })
+    expect(node).toBeTruthy()
+  })
+
+  it('returns undefined when target component props are missing', () => {
     interface PageProps {
       id: string
     }
@@ -113,16 +135,17 @@ describe('withLayouts', () => {
     const MissingComponent: React.FC<{ missing: boolean }> = () => null
 
     const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
-      useLayoutProps(MissingComponent)
-      return <>{children}</>
+      const props = useLayoutProps(MissingComponent)
+      return <div data-missing={String(props === undefined)}>{children}</div>
     }
 
     const Wrapped = withLayouts(Page, [Layout])
+    let renderer!: TestRenderer.ReactTestRenderer
+    act(() => {
+      renderer = TestRenderer.create(<Wrapped id='abc' />)
+    })
 
-    expect(() => {
-      act(() => {
-        TestRenderer.create(<Wrapped id='abc' />)
-      })
-    }).toThrow('useLayoutProps: props for "MissingComponent" were not found in context')
+    const node = renderer.root.findByProps({ 'data-missing': 'true' })
+    expect(node).toBeTruthy()
   })
 })

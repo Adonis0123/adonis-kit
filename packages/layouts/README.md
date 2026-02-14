@@ -18,7 +18,7 @@ import { withLayouts, useLayoutProps } from '@adonis-kit/layouts'
 const Page: React.FC<{ title: string }> = ({ title }) => <h2>{title}</h2>
 
 const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const { title } = useLayoutProps(Page) // type-safe, inferred as { title: string }
+  const title = useLayoutProps(Page)?.title ?? 'Untitled'
   return (
     <div>
       <header>{title}</header>
@@ -69,20 +69,34 @@ Retrieves the props of a specific component from the nearest `withLayouts` conte
 
 ```tsx
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const { title } = useLayoutProps(Page) // ← fully typed
+  const title = useLayoutProps(Page)?.title ?? 'Untitled'
   return <div>{children}</div>
 }
 ```
 
-Throws if the target component is not found in context.
+Returns `undefined` if the target component is not found in context.
 
 ### `useLayoutProps()`
+
+Returns the latest component props from the current `withLayouts` context (`T | undefined`).
+
+```tsx
+const Debug: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const currentProps = useLayoutProps<{ title: string }>()
+  console.log('Latest props title:', currentProps?.title)
+  return <>{children}</>
+}
+```
+
+### `useAllLayoutProps()`
 
 Returns all component props as a `ReadonlyMap<ComponentType, unknown>`.
 
 ```tsx
-const Debug: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const allProps = useLayoutProps()
+import { useAllLayoutProps } from '@adonis-kit/layouts'
+
+const DebugMap: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const allProps = useAllLayoutProps()
   console.log('Components in context:', allProps.size)
   return <>{children}</>
 }
@@ -117,7 +131,7 @@ Layouts themselves can use `withLayouts` to introduce sub-layouts. The inner `us
 
 ```tsx
 const InnerLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const { title } = useLayoutProps(Page) // works — reads from outer context
+  const title = useLayoutProps(Page)?.title // works — reads from outer context
   return <section>{children}</section>
 }
 
@@ -143,3 +157,14 @@ App.getInitialProps // ← preserved
 ## Acknowledgements
 
 This package was originally inspired by [react-dx](https://github.com/yunsii/react-dx). Special thanks to the original author for the foundational ideas.
+
+### Differences from react-dx
+
+| Topic | `react-dx` | `@adonis-kit/layouts` | Tradeoff |
+|---|---|---|---|
+| Hook naming | `usePageProps` + `useAllPageProps` | `useLayoutProps` + `useAllLayoutProps` | Layout naming is more explicit for this package, but migration needs API rename |
+| `useLayoutProps(component)` missing target | Returns `undefined` | Returns `undefined` | More fault-tolerant; caller handles nullability |
+| No-arg hook behavior | `usePageProps()` returns latest component props | `useLayoutProps()` returns latest component props | Familiar behavior for `react-dx` users |
+| Full map access | `useAllPageProps()` | `useAllLayoutProps()` | Same capability with package-specific naming |
+| Anonymous layout `displayName` | Auto-assigned at runtime | Auto-assigned at runtime | Better DevTools readability; mutates layout component object |
+| Static property hoist | Direct assignment | Preserves property descriptors (`Object.defineProperty`) | Better compatibility with getter/setter statics, slightly more implementation complexity |

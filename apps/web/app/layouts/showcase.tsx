@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 
-import { useLayoutProps, withLayouts } from '@adonis-kit/layouts'
+import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/layouts'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@adonis-kit/ui'
 
 interface PageProps {
@@ -20,7 +20,9 @@ const PageContent: React.FC<PageProps> = ({ defaultPage }) => {
       </CardHeader>
       <CardContent className='space-y-3 text-sm text-slate-700'>
         <p>defaultPage: {defaultPage}</p>
-        <Button onClick={() => setCount((v) => v + 1)}>count +1: {count}</Button>
+        <Button type='button' onClick={() => setCount((v) => v + 1)}>
+          count +1: {count}
+        </Button>
       </CardContent>
     </Card>
   )
@@ -45,7 +47,7 @@ const InternalLayout2: React.FC<React.PropsWithChildren> = ({ children }) => {
   const renderCountRef = useRef(0)
   renderCountRef.current += 1
 
-  const allLayoutProps = useLayoutProps()
+  const allLayoutProps = useAllLayoutProps()
   const pageProps = useLayoutProps(PageContent)
   const currentLayoutProps = useLayoutProps(InternalLayout2)
 
@@ -58,8 +60,8 @@ const InternalLayout2: React.FC<React.PropsWithChildren> = ({ children }) => {
       <CardContent className='space-y-2 text-sm text-slate-700'>
         <p>renderCount: {renderCountRef.current}</p>
         <p>allLayoutProps.size: {allLayoutProps.size}</p>
-        <p>useLayoutProps(PageContent): {pageProps.defaultPage}</p>
-        <p>useLayoutProps(InternalLayout2).children: {currentLayoutProps.children ? 'yes' : 'no'}</p>
+        <p>useLayoutProps(PageContent): {pageProps?.defaultPage ?? 'n/a'}</p>
+        <p>useLayoutProps(InternalLayout2).children: {currentLayoutProps?.children ? 'yes' : 'no'}</p>
         {children}
       </CardContent>
     </Card>
@@ -75,7 +77,7 @@ const Layout2 = withLayouts(InternalLayout2, [
           <CardTitle>Layout2 Inner</CardTitle>
         </CardHeader>
         <CardContent className='space-y-2 text-sm text-slate-700'>
-          <p>Current page defaultPage: {pageProps.defaultPage}</p>
+          <p>Current page defaultPage: {pageProps?.defaultPage ?? 'n/a'}</p>
           {children}
         </CardContent>
       </Card>
@@ -98,12 +100,20 @@ const ComposedPage = withLayouts(PageContent, [
   Layout1,
   ({ children }) => {
     const [localCount, setLocalCount] = useState(0)
+    const latestPageProps = useLayoutProps<PageProps>()
+    const allLayoutProps = useAllLayoutProps()
 
     return (
       <div className='space-y-3'>
-        <Button variant='outline' onClick={() => setLocalCount((v) => v + 1)}>
+        <Button type='button' variant='outline' onClick={() => setLocalCount((v) => v + 1)}>
           localCount +1: {localCount}
         </Button>
+        <p className='text-xs text-slate-600'>
+          useLayoutProps&lt;PageProps&gt;(): {latestPageProps?.defaultPage ?? 'n/a'}
+        </p>
+        <p className='text-xs text-slate-600'>
+          useAllLayoutProps().size: {allLayoutProps.size}
+        </p>
         <Layout2>{children}</Layout2>
       </div>
     )
@@ -131,7 +141,7 @@ export function LayoutsDemo({ compact = false }: { compact?: boolean }) {
             </p>
           )}
       <div>
-        <Button onClick={() => setDefaultPage((v) => v + 1)}>
+        <Button type='button' onClick={() => setDefaultPage((v) => v + 1)}>
           defaultPage +1: {defaultPage}
         </Button>
       </div>

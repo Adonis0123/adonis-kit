@@ -6,8 +6,14 @@ A pnpm monorepo for publishing reusable React utilities and a personal shadcn re
 
 | Package | Description | Distribution |
 |---------|-------------|-------------|
-| `@adonis-kit/layouts` | Layout composition via HOC (`withLayouts`, `useLayoutProps`) | npm + shadcn registry |
+| `@adonis-kit/layouts` | Layout composition via HOC (`withLayouts`, `useLayoutProps`, `useAllLayoutProps`) | npm + shadcn registry |
 | `@adonis-kit/ui` | shadcn-style UI primitives (Button, Card) | npm + shadcn registry |
+
+## `@adonis-kit/layouts` API Notes
+
+- `useLayoutProps(component)` returns inferred props for the target component, or `undefined` when not found.
+- `useLayoutProps<T>()` (no argument) returns the latest component props in the current layout context.
+- `useAllLayoutProps()` returns all props in context as `ReadonlyMap<ComponentType, unknown>`.
 
 ## Apps
 

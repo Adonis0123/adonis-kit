@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useLayoutProps } from '../hooks'
+import { useAllLayoutProps, useLayoutProps } from '../hooks'
 import { withLayouts } from '../with-layouts'
 
 interface PageProps {
@@ -18,11 +18,11 @@ Page.routeMeta = { auth: true }
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const props = useLayoutProps(Page)
-  const title: string = props.title
+  // @ts-expect-error props can be undefined
+  const requiredTitle: string = props.title
+  const title: string | undefined = props?.title
 
-  // @ts-expect-error property does not exist
-  props.count
-
+  void requiredTitle
   void title
   return <>{children}</>
 }
@@ -34,7 +34,7 @@ wrappedProps.title
 Wrapped.routeMeta?.auth
 
 const ReadonlyMapLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const allProps = useLayoutProps()
+  const allProps = useAllLayoutProps()
 
   allProps.get(Page)
   allProps.has(Layout)
@@ -42,6 +42,10 @@ const ReadonlyMapLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   // @ts-expect-error ReadonlyMap cannot be mutated
   allProps.set(Page, { title: 'mutate' })
 
+  const current = useLayoutProps<PageProps>()
+  const maybeTitle: string | undefined = current?.title
+
+  void maybeTitle
   return <>{children}</>
 }
 
@@ -49,4 +53,3 @@ void ReadonlyMapLayout
 
 // @ts-expect-error invalid hoist key
 withLayouts(Page, [Layout], { propertiesHoist: ['missing'] as const })
-

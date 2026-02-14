@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 
-import { useLayoutProps, withLayouts } from '@adonis-kit/layouts'
+import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/layouts'
 
 interface PageProps {
   defaultPage: number
@@ -34,7 +34,7 @@ const InternalLayout2: React.FC<React.PropsWithChildren<{ mark?: string }>> = ({
   const renderCountRef = useRef(0)
   renderCountRef.current += 1
 
-  const allLayoutProps = useLayoutProps()
+  const allLayoutProps = useAllLayoutProps()
   const pageProps = useLayoutProps(PageContent)
   const currentLayoutProps = useLayoutProps(InternalLayout2)
 
@@ -43,8 +43,8 @@ const InternalLayout2: React.FC<React.PropsWithChildren<{ mark?: string }>> = ({
       <div className='panel-title'>Layout2 Start</div>
       <p>renderCount: {renderCountRef.current}</p>
       <p>Map size (AllLayoutProps): {allLayoutProps.size}</p>
-      <p>useLayoutProps(PageContent): {pageProps.defaultPage}</p>
-      <p>useLayoutProps(InternalLayout2).mark: {currentLayoutProps.mark ?? 'n/a'}</p>
+      <p>useLayoutProps(PageContent): {pageProps?.defaultPage ?? 'n/a'}</p>
+      <p>useLayoutProps(InternalLayout2).mark: {currentLayoutProps?.mark ?? 'n/a'}</p>
       {children}
       <div className='panel-title'>Layout2 End</div>
     </section>
@@ -58,8 +58,8 @@ const Layout2 = withLayouts(InternalLayout2, [
     return (
       <section className='panel panel-l2x'>
         <div className='panel-title'>Layout2-Inner Start</div>
-        <p>Current page defaultPage: {pageProps.defaultPage}</p>
-        <p>Outer layout mark: {layoutProps.mark ?? 'n/a'}</p>
+        <p>Current page defaultPage: {pageProps?.defaultPage ?? 'n/a'}</p>
+        <p>Outer layout mark: {layoutProps?.mark ?? 'n/a'}</p>
         {children}
         <div className='panel-title'>Layout2-Inner End</div>
       </section>
