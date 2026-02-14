@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 
-import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/react-layouts'
+import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/react-layouts/client'
 
 interface PageProps {
   defaultPage: number

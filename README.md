@@ -6,14 +6,22 @@ A pnpm monorepo for publishing reusable React utilities and a personal shadcn re
 
 | Package | Description | Distribution |
 |---------|-------------|-------------|
-| `@adonis-kit/react-layouts` | Layout composition via HOC (`withLayouts`, `useLayoutProps`, `useAllLayoutProps`) | npm + shadcn registry |
+| `@adonis-kit/react-layouts` | React layout composition with dual runtime entries (`/client`, `/server`) | npm + shadcn registry |
 | `@adonis-kit/ui` | shadcn-style UI primitives (Button, Card) | npm + shadcn registry |
 
 ## `@adonis-kit/react-layouts` API Notes
 
-- `useLayoutProps(component)` returns inferred props for the target component, or `undefined` when not found.
-- `useLayoutProps<T>()` (no argument) returns the latest component props in the current layout context.
-- `useAllLayoutProps()` returns all props in context as `ReadonlyMap<ComponentType, unknown>`.
+- `@adonis-kit/react-layouts` is the default client entry for backward compatibility.
+- `@adonis-kit/react-layouts/client` is the explicit client entry (`withLayouts`, `useLayoutProps`, `useAllLayoutProps`).
+- `@adonis-kit/react-layouts/server` is the explicit server entry (`withServerLayouts`, `ServerLayoutComponent`).
+- `useLayoutProps` and `useAllLayoutProps` are client-only APIs and must be used inside client components.
+
+Minimal usage:
+
+```tsx
+import { withLayouts } from '@adonis-kit/react-layouts/client'
+import { withServerLayouts } from '@adonis-kit/react-layouts/server'
+```
 
 ## Apps
 

@@ -1,6 +1,6 @@
 # @adonis-kit/react-layouts
 
-Declarative layout composition for React. Wrap any page component with nested layouts and share props across the tree via context — zero prop-drilling required.
+Declarative layout composition for React with dual-runtime entry points for Next.js App Router style architectures.
 
 ## Install
 
@@ -26,10 +26,22 @@ bun add @adonis-kit/react-layouts
 pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/react-layouts.json
 ```
 
+## Entry Points
+
+| Entry | Runtime | Purpose |
+|---|---|---|
+| `@adonis-kit/react-layouts` | Client | Default client entry for backward compatibility |
+| `@adonis-kit/react-layouts/client` | Client | Explicit client entry (`withLayouts`, `useLayoutProps`, `useAllLayoutProps`) |
+| `@adonis-kit/react-layouts/server` | Server | Explicit server entry (`withServerLayouts`, `ServerLayoutComponent`) |
+
 ## Quick Start
 
+### Client Example
+
 ```tsx
-import { withLayouts, useLayoutProps } from '@adonis-kit/react-layouts'
+'use client'
+
+import { withLayouts, useLayoutProps } from '@adonis-kit/react-layouts/client'
 
 const Page: React.FC<{ title: string }> = ({ title }) => <h2>{title}</h2>
 
@@ -43,149 +55,102 @@ const Header: React.FC<React.PropsWithChildren> = ({ children }) => {
   )
 }
 
-const App = withLayouts(Page, [Header])
-
-// Usage: <App title="Hello" />
-// Renders:
-// <Header>
-//   <Page title="Hello" />
-// </Header>
+export const App = withLayouts(Page, [Header])
 ```
+
+### Server Example
+
+```tsx
+import { withServerLayouts, type ServerLayoutComponent } from '@adonis-kit/react-layouts/server'
+
+type PageProps = { title: string }
+
+const Page = async ({ title }: PageProps) => <article>{title}</article>
+
+const ShellLayout: ServerLayoutComponent<PageProps> = async ({ children, pageProps }) => (
+  <section>
+    <h1>{pageProps.title}</h1>
+    {children}
+  </section>
+)
+
+export const ServerPage = withServerLayouts(Page, [ShellLayout])
+```
+
+## Runtime Matrix
+
+| Feature | Client Component | Server Component |
+|---|---|---|
+| `withLayouts` | Yes (`/client`) | No |
+| `useLayoutProps` | Yes (`/client`) | No |
+| `useAllLayoutProps` | Yes (`/client`) | No |
+| `withServerLayouts` | No | Yes (`/server`) |
+| `ServerLayoutComponent` | No | Yes (`/server`) |
+
+## Next.js App Router Guidance
+
+1. In `layout.tsx` / `page.tsx` (server by default), import from `@adonis-kit/react-layouts/server`.
+2. In client islands (`'use client'`), import from `@adonis-kit/react-layouts/client`.
+3. Do not use `useLayoutProps` or `useAllLayoutProps` inside server components.
+4. Use `withServerLayouts` when you need composition at the server boundary.
 
 ## API
 
-### `withLayouts(Page, Layouts, options?)`
+### Client API
 
-Composes a page component with an array of layout wrappers. Layouts nest **inside-out** — the first layout is closest to the page.
+#### `withLayouts(Page, Layouts, options?)`
 
-```tsx
-const Composed = withLayouts(Page, [Layout1, Layout2])
+Composes a page component with an array of layout wrappers. Layouts nest inside-out.
 
-// Equivalent to:
-// <Layout2>
-//   <Layout1>
-//     <Page />
-//   </Layout1>
-// </Layout2>
-```
+#### `useLayoutProps(component?)`
 
-**Parameters:**
+Reads a specific component props object (or latest props when no argument is passed) from the nearest client layout context.
 
-| Name | Type | Description |
-|---|---|---|
-| `Page` | `ComponentType` | The page component to wrap |
-| `Layouts` | `ComponentType<PropsWithChildren>[]` | Layout components applied inside-out |
-| `options.propertiesHoist` | `string[]` | Static properties to copy from `Page` to the composed component |
+#### `useAllLayoutProps()`
 
-**Returns:** A component that accepts the same props as `Page`.
+Returns all component props as `ReadonlyMap<ComponentType, unknown>`.
 
-### `useLayoutProps(component)`
+### Server API
 
-Retrieves the props of a specific component from the nearest `withLayouts` context. Types are automatically inferred.
+#### `withServerLayouts(Page, Layouts, options?)`
 
-```tsx
-const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const title = useLayoutProps(Page)?.title ?? 'Untitled'
-  return <div>{children}</div>
+Composes a server page with server layouts. Each layout receives:
+
+```ts
+{
+  children: React.ReactNode
+  pageProps: PageProps
 }
 ```
 
-Returns `undefined` if the target component is not found in context.
+Supports async page and async layouts.
 
-### `useLayoutProps()`
+#### `ServerLayoutComponent<PageProps>`
 
-Returns the latest component props from the current `withLayouts` context (`T | undefined`).
+Type helper for server layout components that accept `children` and `pageProps`.
 
-```tsx
-const Debug: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const currentProps = useLayoutProps<{ title: string }>()
-  console.log('Latest props title:', currentProps?.title)
-  return <>{children}</>
-}
-```
+## Migration
 
-### `useAllLayoutProps()`
-
-Returns all component props as a `ReadonlyMap<ComponentType, unknown>`.
+### From root import to explicit client entry
 
 ```tsx
-import { useAllLayoutProps } from '@adonis-kit/react-layouts'
+// Before
+import { withLayouts, useLayoutProps } from '@adonis-kit/react-layouts'
 
-const DebugMap: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const allProps = useAllLayoutProps()
-  console.log('Components in context:', allProps.size)
-  return <>{children}</>
-}
+// Recommended
+import { withLayouts, useLayoutProps } from '@adonis-kit/react-layouts/client'
 ```
 
-## Recipes
-
-### Multiple Layouts
+### Add server composition explicitly
 
 ```tsx
-const Sidebar: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <div className="with-sidebar">
-    <nav>Sidebar</nav>
-    <div>{children}</div>
-  </div>
-)
-
-const Footer: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <>
-    {children}
-    <footer>Footer</footer>
-  </>
-)
-
-// Nesting order: Page → Sidebar → Footer (outermost)
-const App = withLayouts(Page, [Sidebar, Footer])
+import { withServerLayouts } from '@adonis-kit/react-layouts/server'
 ```
 
-### Nested `withLayouts`
+### Compatibility
 
-Layouts themselves can use `withLayouts` to introduce sub-layouts. The inner `useLayoutProps` can access props from any ancestor context.
-
-```tsx
-const InnerLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const title = useLayoutProps(Page)?.title // works — reads from outer context
-  return <section>{children}</section>
-}
-
-const OuterLayout = withLayouts(InnerLayout, [SubLayout])
-
-const App = withLayouts(Page, [OuterLayout])
-```
-
-### Hoisting Static Properties
-
-If your page component has static properties (e.g. `getLayout`), hoist them to the composed component:
-
-```tsx
-Page.getInitialProps = async () => ({ title: 'Hello' })
-
-const App = withLayouts(Page, [Layout], {
-  propertiesHoist: ['getInitialProps'],
-})
-
-App.getInitialProps // ← preserved
-```
+Root import (`@adonis-kit/react-layouts`) stays as the default client entry for compatibility, but explicit subpath imports are recommended for clear runtime boundaries.
 
 ## Acknowledgements
 
 This package was originally inspired by [react-dx](https://github.com/yunsii/react-dx). Special thanks to the original author for the foundational ideas.
-
-### Differences from react-dx
-
-| Topic | `react-dx` | `@adonis-kit/react-layouts` | Tradeoff |
-|---|---|---|---|
-| Hook naming | `usePageProps` + `useAllPageProps` | `useLayoutProps` + `useAllLayoutProps` | Layout naming is more explicit for this package, but migration needs API rename |
-| `useLayoutProps(component)` missing target | Returns `undefined` | Returns `undefined` | More fault-tolerant; caller handles nullability |
-| No-arg hook behavior | `usePageProps()` returns latest component props | `useLayoutProps()` returns latest component props | Familiar behavior for `react-dx` users |
-| Full map access | `useAllPageProps()` | `useAllLayoutProps()` | Same capability with package-specific naming |
-| Anonymous layout `displayName` | Auto-assigned at runtime | Auto-assigned at runtime | Better DevTools readability; mutates layout component object |
-| Static property hoist | Direct assignment (`=`) | `Object.defineProperty` preserving descriptors | Better compatibility with getter/setter statics, slightly more implementation complexity |
-| TypeScript inference | Requires manual generic `usePageProps<T>()` | Function overloads infer props from component reference | Less boilerplate when passing a component argument |
-| Props Map mutability | Returns mutable `Map` | Returns `ReadonlyMap` | Prevents accidental mutation of shared state |
-| `propertiesHoist` type safety | Accepts arbitrary `string[]` | Generic constraint `(keyof C)[]` — validated at compile time | Catches typos and invalid keys before runtime |
-| Props value type | `Record<string, any>` | `unknown` | Stricter — requires explicit narrowing, but catches type errors earlier |
-| Test coverage | No formal test suite | Vitest + `@testing-library/react` with behavior-focused assertions | Higher confidence for refactors and upgrades |

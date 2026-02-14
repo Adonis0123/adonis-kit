@@ -9,7 +9,11 @@ export default defineConfig({
     emptyOutDir: false,
     minify: false,
     lib: {
-      entry: path.resolve(__dirname, 'src/index.ts'),
+      entry: {
+        index: path.resolve(__dirname, 'src/index.ts'),
+        client: path.resolve(__dirname, 'src/client.ts'),
+        server: path.resolve(__dirname, 'src/server.ts'),
+      },
       formats: ['es'],
     },
     rollupOptions: {

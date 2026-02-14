@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/react-layouts'
+import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/react-layouts/client'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@adonis-kit/ui'
 
 // ─── Example 1: Basic ────────────────────────────────────────────────────────
