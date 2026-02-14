@@ -35,10 +35,10 @@ importers:
 
   apps/web:
     dependencies:
-      '@adonis/react-layouts':
+      '@adonis-kit/layouts':
         specifier: workspace:*
         version: link:../../packages/layouts
-      '@adonis/react-ui':
+      '@adonis-kit/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       next:

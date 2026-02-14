@@ -1,17 +1,17 @@
-# @adonis/react-layouts
+# @adonis-kit/layouts
 
 React layout composition helpers migrated from `react-dx` (phase 1, no optimization).
 
 ## Install
 
 ```bash
-pnpm add @adonis/react-layouts
+pnpm add @adonis-kit/layouts
 ```
 
 ## Usage
 
 ```tsx
-import { withLayouts, useLayoutProps } from '@adonis/react-layouts'
+import { withLayouts, useLayoutProps } from '@adonis-kit/layouts'
 
 type PageProps = { title: string }
 

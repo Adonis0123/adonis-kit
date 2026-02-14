@@ -1,5 +1,5 @@
 {
-  "name": "@adonis/react-ui",
+  "name": "@adonis-kit/ui",
   "version": "0.0.0",
   "type": "module",
   "description": "Personal shadcn-based React UI components.",

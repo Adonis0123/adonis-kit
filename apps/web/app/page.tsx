@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@adonis/react-ui'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@adonis-kit/ui'
 import { features } from '@/lib/features'
 
 export default function HomePage() {
@@ -18,7 +18,7 @@ export default function HomePage() {
             URL mode: <code>pnpm dlx shadcn@latest add https://&lt;domain&gt;/r/button.json</code>
           </p>
           <p>
-            Namespace mode: <code>pnpm dlx shadcn@latest add @adonis/button</code>
+            Namespace mode: <code>pnpm dlx shadcn@latest add @adonis-kit/button</code>
           </p>
           <div className='flex flex-wrap gap-3'>
             <Button asChild>

@@ -20,7 +20,7 @@ pnpm dev:web                        # Next.js dev server only
 pnpm build:web                      # Build web app only
 
 # Per-package commands
-pnpm -C packages/layouts test       # Vitest for @adonis/react-layouts
+pnpm -C packages/layouts test       # Vitest for @adonis-kit/layouts
 pnpm -C packages/layouts dev        # Vite demo server (port 5174)
 pnpm -C packages/ui build           # Bundle UI with tsup
 
@@ -37,12 +37,12 @@ pnpm registry:build                 # Build shadcn registry JSON to apps/web/pub
 
 ```
 ├── packages/
-│   ├── layouts/          # @adonis/react-layouts — React layout composition (Vite + Vitest)
-│   └── ui/               # @adonis/react-ui — shadcn-style components (tsup)
+│   ├── layouts/          # @adonis-kit/layouts — React layout composition (Vite + Vitest)
+│   └── ui/               # @adonis-kit/ui — shadcn-style components (tsup)
 ├── apps/
 │   └── web/              # Next.js 15 showcase + shadcn registry host
 ├── registry/             # shadcn component source files for distribution
-│   └── new-york/ui/      # Components matching @adonis/react-ui
+│   └── new-york/ui/      # Components matching @adonis-kit/ui
 └── .ruler/               # Ruler config — generates CLAUDE.md and AGENTS.md
 ```
 

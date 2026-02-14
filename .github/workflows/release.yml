@@ -31,7 +31,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build publishable packages
-        run: pnpm turbo run build --filter=@adonis/react-layouts --filter=@adonis/react-ui
+        run: pnpm turbo run build --filter=@adonis-kit/layouts --filter=@adonis-kit/ui
 
       - name: Create release PR or publish
         uses: changesets/action@v1

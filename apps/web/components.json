@@ -13,11 +13,11 @@
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
-    "ui": "@adonis/react-ui",
+    "ui": "@adonis-kit/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
   "registries": {
-    "@adonis": "https://adonis-react-utils.vercel.app/r/{name}.json"
+    "@adonis-kit": "https://adonis-kit.vercel.app/r/{name}.json"
   }
 }

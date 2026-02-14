@@ -1,8 +1,8 @@
-# adonis-react-utils 发布流程（npm + Vercel）
+# adonis-kit 发布流程（npm + Vercel）
 
 本文档只聚焦两条发布主线：
 
-1. npm 包发布：`@adonis/react-layouts`、`@adonis/react-ui`
+1. npm 包发布：`@adonis-kit/layouts`、`@adonis-kit/ui`
 2. Vercel 部署：`apps/web`（包含 shadcn registry 静态入口）
 
 ## 1. 一次性准备
@@ -31,7 +31,7 @@ Vercel Project 建议配置：
 
 ### 1.3 域名替换（首次上线或域名变更时）
 
-将 `https://adonis-react-utils.vercel.app` 替换为你的真实域名：
+将 `https://adonis-kit.vercel.app` 替换为你的真实域名：
 
 - `registry.json`
 - `apps/web/components.json`
@@ -76,7 +76,7 @@ git push
 合并到 `main` 后，`release.yml` 会运行：
 
 1. 安装依赖
-2. 构建可发布包（`@adonis/react-layouts`、`@adonis/react-ui`）
+2. 构建可发布包（`@adonis-kit/layouts`、`@adonis-kit/ui`）
 3. 执行 `changesets/action`
 
 ### 步骤 4：发布行为说明
@@ -87,8 +87,8 @@ git push
 ### 步骤 5：发布后检查
 
 ```bash
-npm view @adonis/react-layouts version
-npm view @adonis/react-ui version
+npm view @adonis-kit/layouts version
+npm view @adonis-kit/ui version
 ```
 
 ## 4. Vercel 发布流程（web + registry）

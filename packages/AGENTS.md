@@ -16,7 +16,7 @@ Run from monorepo root unless noted:
 - `pnpm lint`: Type-check-based lint task in each package.
 - `pnpm typecheck`: Full workspace type checks.
 - `pnpm dev`: Starts workspace dev tasks in parallel.
-- `pnpm -C packages/layouts test`: Runs Vitest suite for `@adonis/react-layouts`.
+- `pnpm -C packages/layouts test`: Runs Vitest suite for `@adonis-kit/layouts`.
 - `pnpm -C packages/layouts dev`: Runs Vite demo server for layouts.
 - `pnpm -C packages/ui build`: Bundles UI package with `tsup`.
 

@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@adonis/react-layouts': path.resolve(__dirname, 'src/index.ts'),
+      '@adonis-kit/layouts': path.resolve(__dirname, 'src/index.ts'),
     },
   },
   server: {

@@ -5,16 +5,16 @@
       "@/*": [
         "./*"
       ],
-      "@adonis/react-layouts": [
+      "@adonis-kit/layouts": [
         "../../packages/layouts/src/index.ts"
       ],
-      "@adonis/react-layouts/*": [
+      "@adonis-kit/layouts/*": [
         "../../packages/layouts/src/*"
       ],
-      "@adonis/react-ui": [
+      "@adonis-kit/ui": [
         "../../packages/ui/src/index.ts"
       ],
-      "@adonis/react-ui/*": [
+      "@adonis-kit/ui/*": [
         "../../packages/ui/src/*"
       ]
     },
