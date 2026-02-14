@@ -11,8 +11,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@react-utils/layouts": "workspace:*",
-    "@react-utils/ui": "workspace:*",
+    "@adonis/react-layouts": "workspace:*",
+    "@adonis/react-ui": "workspace:*",
     "next": "^15.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

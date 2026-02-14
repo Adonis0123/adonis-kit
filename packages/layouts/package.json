@@ -1,5 +1,5 @@
 {
-  "name": "@react-utils/layouts",
+  "name": "@adonis/react-layouts",
   "version": "0.0.0",
   "type": "module",
   "description": "React layout composition utilities.",

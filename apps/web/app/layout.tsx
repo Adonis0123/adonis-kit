@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'react-utils registry',
+  title: 'adonis-react-utils registry',
   description: 'Personal shadcn registry and layouts showcase',
 }
 
@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className='min-h-screen bg-slate-50 text-slate-900 antialiased'>
         <div className='mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-8'>
           <header className='mb-8 flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between'>
-            <h1 className='text-xl font-semibold tracking-tight'>react-utils registry</h1>
+            <h1 className='text-xl font-semibold tracking-tight'>adonis-react-utils registry</h1>
             <nav className='flex items-center gap-4 text-sm'>
               <Link href='/' className='text-slate-700 hover:text-slate-950'>
                 Home

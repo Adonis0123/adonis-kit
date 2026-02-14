@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "@react-utils",
-  "homepage": "https://react-utils.vercel.app",
+  "name": "@adonis",
+  "homepage": "https://adonis-react-utils.vercel.app",
   "items": [
     {
       "name": "button",

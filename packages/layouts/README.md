@@ -1,17 +1,17 @@
-# @react-utils/layouts
+# @adonis/react-layouts
 
 React layout composition helpers migrated from `react-dx` (phase 1, no optimization).
 
 ## Install
 
 ```bash
-pnpm add @react-utils/layouts
+pnpm add @adonis/react-layouts
 ```
 
 ## Usage
 
 ```tsx
-import { withLayouts, useLayoutProps } from '@react-utils/layouts'
+import { withLayouts, useLayoutProps } from '@adonis/react-layouts'
 
 type PageProps = { title: string }
 
@@ -41,5 +41,5 @@ export const ComposedPage = withLayouts(Page, [Layout])
 
 ## Acknowledgements
 
-This package was originally migrated from [react-dx](https://github.com/yunsii/react-dx).  
+This package was originally migrated from [react-dx](https://github.com/yunsii/react-dx).
 Special thanks to the original author for the foundational ideas and implementation.

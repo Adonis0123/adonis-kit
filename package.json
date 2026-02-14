@@ -1,5 +1,5 @@
 {
-  "name": "react-utils-packages",
+  "name": "adonis-react-utils",
   "private": true,
   "version": "0.0.0",
   "packageManager": "pnpm@8.10.2",

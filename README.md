@@ -1,11 +1,11 @@
-# react-utils-packages
+# adonis-react-utils
 
 A pnpm monorepo for publishing reusable React utilities and a personal shadcn registry.
 
 ## Packages
 
-- `@react-utils/layouts`
-- `@react-utils/ui`
+- `@adonis/react-layouts`
+- `@adonis/react-ui`
 
 ## Apps
 
@@ -40,7 +40,7 @@ Configure consumer `components.json`:
 ```json
 {
   "registries": {
-    "@react-utils": "https://<your-domain>/r/{name}.json"
+    "@adonis": "https://<your-domain>/r/{name}.json"
   }
 }
 ```
@@ -48,14 +48,14 @@ Configure consumer `components.json`:
 Then install:
 
 ```bash
-pnpm dlx shadcn@latest add @react-utils/button
+pnpm dlx shadcn@latest add @adonis/button
 ```
 
 ## npm Distribution
 
 ```bash
-pnpm add @react-utils/ui
-pnpm add @react-utils/layouts
+pnpm add @adonis/react-ui
+pnpm add @adonis/react-layouts
 ```
 
 ## Vercel Setup

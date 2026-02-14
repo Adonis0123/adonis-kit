@@ -2,8 +2,8 @@
 
 import { useRef, useState } from 'react'
 
-import { useLayoutProps, withLayouts } from '@react-utils/layouts'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@react-utils/ui'
+import { useLayoutProps, withLayouts } from '@adonis/react-layouts'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@adonis/react-ui'
 
 interface PageProps {
   defaultPage: number
@@ -121,13 +121,13 @@ export function LayoutsDemo({ compact = false }: { compact?: boolean }) {
             <>
               <h2 className='text-xl font-semibold'>withLayouts Showcase</h2>
               <p className='text-sm text-slate-600'>
-                This page is hosted in Next.js and demonstrates the migrated `@react-utils/layouts` behavior.
+                This page is hosted in Next.js and demonstrates the migrated `@adonis/react-layouts` behavior.
               </p>
             </>
           )
         : (
             <p className='text-sm text-slate-600'>
-              Live preview of `withLayouts` rendered with `@react-utils/ui` components.
+              Live preview of `withLayouts` rendered with `@adonis/react-ui` components.
             </p>
           )}
       <div>

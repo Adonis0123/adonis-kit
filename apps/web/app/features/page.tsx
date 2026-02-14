@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@react-utils/ui'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@adonis/react-ui'
 import { features } from '@/lib/features'
 
 export default function FeaturesPage() {
