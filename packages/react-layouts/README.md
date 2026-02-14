@@ -1,11 +1,11 @@
-# @adonis-kit/layouts
+# @adonis-kit/react-layouts
 
 Declarative layout composition for React. Wrap any page component with nested layouts and share props across the tree via context — zero prop-drilling required.
 
 ## Install
 
 ```bash
-pnpm add @adonis-kit/layouts
+pnpm add @adonis-kit/react-layouts
 ```
 
 > Peer dependency: `react >= 16.9.0`
@@ -13,7 +13,7 @@ pnpm add @adonis-kit/layouts
 ## Quick Start
 
 ```tsx
-import { withLayouts, useLayoutProps } from '@adonis-kit/layouts'
+import { withLayouts, useLayoutProps } from '@adonis-kit/react-layouts'
 
 const Page: React.FC<{ title: string }> = ({ title }) => <h2>{title}</h2>
 
@@ -93,7 +93,7 @@ const Debug: React.FC<React.PropsWithChildren> = ({ children }) => {
 Returns all component props as a `ReadonlyMap<ComponentType, unknown>`.
 
 ```tsx
-import { useAllLayoutProps } from '@adonis-kit/layouts'
+import { useAllLayoutProps } from '@adonis-kit/react-layouts'
 
 const DebugMap: React.FC<React.PropsWithChildren> = ({ children }) => {
   const allProps = useAllLayoutProps()
@@ -160,11 +160,16 @@ This package was originally inspired by [react-dx](https://github.com/yunsii/rea
 
 ### Differences from react-dx
 
-| Topic | `react-dx` | `@adonis-kit/layouts` | Tradeoff |
+| Topic | `react-dx` | `@adonis-kit/react-layouts` | Tradeoff |
 |---|---|---|---|
 | Hook naming | `usePageProps` + `useAllPageProps` | `useLayoutProps` + `useAllLayoutProps` | Layout naming is more explicit for this package, but migration needs API rename |
 | `useLayoutProps(component)` missing target | Returns `undefined` | Returns `undefined` | More fault-tolerant; caller handles nullability |
 | No-arg hook behavior | `usePageProps()` returns latest component props | `useLayoutProps()` returns latest component props | Familiar behavior for `react-dx` users |
 | Full map access | `useAllPageProps()` | `useAllLayoutProps()` | Same capability with package-specific naming |
 | Anonymous layout `displayName` | Auto-assigned at runtime | Auto-assigned at runtime | Better DevTools readability; mutates layout component object |
-| Static property hoist | Direct assignment | Preserves property descriptors (`Object.defineProperty`) | Better compatibility with getter/setter statics, slightly more implementation complexity |
+| Static property hoist | Direct assignment (`=`) | `Object.defineProperty` preserving descriptors | Better compatibility with getter/setter statics, slightly more implementation complexity |
+| TypeScript inference | Requires manual generic `usePageProps<T>()` | Function overloads infer props from component reference | Less boilerplate when passing a component argument |
+| Props Map mutability | Returns mutable `Map` | Returns `ReadonlyMap` | Prevents accidental mutation of shared state |
+| `propertiesHoist` type safety | Accepts arbitrary `string[]` | Generic constraint `(keyof C)[]` — validated at compile time | Catches typos and invalid keys before runtime |
+| Props value type | `Record<string, any>` | `unknown` | Stricter — requires explicit narrowing, but catches type errors earlier |
+| Test coverage | No formal test suite | Vitest + `@testing-library/react` with behavior-focused assertions | Higher confidence for refactors and upgrades |

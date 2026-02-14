@@ -6,10 +6,10 @@ A pnpm monorepo for publishing reusable React utilities and a personal shadcn re
 
 | Package | Description | Distribution |
 |---------|-------------|-------------|
-| `@adonis-kit/layouts` | Layout composition via HOC (`withLayouts`, `useLayoutProps`, `useAllLayoutProps`) | npm + shadcn registry |
+| `@adonis-kit/react-layouts` | Layout composition via HOC (`withLayouts`, `useLayoutProps`, `useAllLayoutProps`) | npm + shadcn registry |
 | `@adonis-kit/ui` | shadcn-style UI primitives (Button, Card) | npm + shadcn registry |
 
-## `@adonis-kit/layouts` API Notes
+## `@adonis-kit/react-layouts` API Notes
 
 - `useLayoutProps(component)` returns inferred props for the target component, or `undefined` when not found.
 - `useLayoutProps<T>()` (no argument) returns the latest component props in the current layout context.
@@ -26,7 +26,7 @@ A pnpm monorepo for publishing reusable React utilities and a personal shadcn re
 ```bash
 pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/button.json
 pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/card.json
-pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/layouts.json
+pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/react-layouts.json
 ```
 
 ### Namespace mode
@@ -46,14 +46,14 @@ Then install:
 ```bash
 pnpm dlx shadcn@latest add @adonis-kit/button
 pnpm dlx shadcn@latest add @adonis-kit/card
-pnpm dlx shadcn@latest add @adonis-kit/layouts
+pnpm dlx shadcn@latest add @adonis-kit/react-layouts
 ```
 
 ## npm Distribution
 
 ```bash
 pnpm add @adonis-kit/ui
-pnpm add @adonis-kit/layouts
+pnpm add @adonis-kit/react-layouts
 ```
 
 ## Commands
@@ -80,4 +80,4 @@ pnpm release            # Publish to npm (public access)
   - `https://adonis-kit.vercel.app/registry.json`
   - `https://adonis-kit.vercel.app/r/button.json`
   - `https://adonis-kit.vercel.app/r/card.json`
-  - `https://adonis-kit.vercel.app/r/layouts.json`
+  - `https://adonis-kit.vercel.app/r/react-layouts.json`

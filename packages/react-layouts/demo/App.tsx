@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 
-import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/layouts'
+import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/react-layouts'
 
 interface PageProps {
   defaultPage: number
@@ -100,7 +100,7 @@ export function DemoApp() {
   return (
     <main className='demo-shell'>
       <header>
-        <h1>@adonis-kit/layouts Demo</h1>
+        <h1>@adonis-kit/react-layouts Demo</h1>
         <p>Phase 1 migration showcase with nested layouts and page props context.</p>
       </header>
       <button type='button' onClick={() => setDefaultPage((v) => v + 1)}>

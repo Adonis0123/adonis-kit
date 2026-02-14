@@ -20,8 +20,8 @@ pnpm dev:web                        # Next.js dev server only
 pnpm build:web                      # Build web app only
 
 # Per-package commands
-pnpm -C packages/layouts test       # Vitest for @adonis-kit/layouts
-pnpm -C packages/layouts dev        # Vite demo server (port 5174)
+pnpm -C packages/react-layouts test       # Vitest for @adonis-kit/react-layouts
+pnpm -C packages/react-layouts dev        # Vite demo server (port 5174)
 pnpm -C packages/ui build           # Bundle UI with tsup
 
 # Release workflow
@@ -37,7 +37,7 @@ pnpm registry:build                 # Build shadcn registry JSON to apps/web/pub
 
 ```
 ├── packages/
-│   ├── layouts/          # @adonis-kit/layouts — React layout composition (Vite + Vitest)
+│   ├── react-layouts/    # @adonis-kit/react-layouts — React layout composition (Vite + Vitest)
 │   └── ui/               # @adonis-kit/ui — shadcn-style components (tsup)
 ├── apps/
 │   └── web/              # Next.js 15 showcase + shadcn registry host
@@ -46,12 +46,12 @@ pnpm registry:build                 # Build shadcn registry JSON to apps/web/pub
 └── .ruler/               # Ruler config — generates CLAUDE.md and AGENTS.md
 ```
 
-### packages/layouts
+### packages/react-layouts
 
 Layout composition utility using higher-order components. Core API:
 - `withLayouts(Page, [Layout1, Layout2], options)` — wraps a page component with nested layouts
-- `usePageProps<T>(component?)` — access page props via context
-- `useAllPageProps()` — access all page props map
+- `useLayoutProps<T>(component?)` — access page props via context
+- `useAllLayoutProps()` — access all page props map
 
 Build: `tsc` (declarations) + `vite` (ESM library with preserveModules). Tests: Vitest with `@testing-library/react`. Peer dep: React >= 16.9.0.
 
@@ -82,15 +82,15 @@ pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/button.json
 
 ## Testing
 
-- Framework: Vitest (config in `packages/layouts/vitest.config.ts`)
+- Framework: Vitest (config in `packages/react-layouts/vitest.config.ts`)
 - Test files: `src/__tests__/**/*.test.ts?(x)`
 - Prefer behavior-focused assertions (rendered output, props flow)
 - `packages/ui` has no test suite yet — add Vitest tests for non-trivial logic
 
 ## Commits & Releases
 
-- Conventional Commits: `feat(layouts):`, `fix(ui):`, `chore(web):`
-- Scopes: `layouts`, `ui`, `web`
+- Conventional Commits: `feat(react-layouts):`, `fix(ui):`, `chore(web):`
+- Scopes: `react-layouts`, `ui`, `web`
 - Add a Changeset (`pnpm changeset`) for publishable package changes
 - Changesets config: public access, no changelog generation, no auto-commit
 

@@ -38,26 +38,26 @@
       ]
     },
     {
-      "name": "layouts",
+      "name": "react-layouts",
       "type": "registry:lib",
-      "title": "Layouts",
-      "description": "Layout composition utility using higher-order components. Includes withLayouts, useLayoutProps.",
+      "title": "React Layouts",
+      "description": "Layout composition utility using higher-order components. Includes withLayouts, useLayoutProps, and useAllLayoutProps.",
       "dependencies": [],
       "files": [
         {
-          "path": "packages/layouts/src/with-layouts.tsx",
+          "path": "packages/react-layouts/src/with-layouts.tsx",
           "type": "registry:lib"
         },
         {
-          "path": "packages/layouts/src/context.tsx",
+          "path": "packages/react-layouts/src/context.tsx",
           "type": "registry:lib"
         },
         {
-          "path": "packages/layouts/src/hooks.ts",
+          "path": "packages/react-layouts/src/hooks.ts",
           "type": "registry:lib"
         },
         {
-          "path": "packages/layouts/src/internal/react-nodes.tsx",
+          "path": "packages/react-layouts/src/internal/react-nodes.tsx",
           "type": "registry:lib"
         }
       ]

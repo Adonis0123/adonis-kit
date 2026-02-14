@@ -8,12 +8,12 @@ export interface FeatureItem {
 
 export const features: FeatureItem[] = [
   {
-    key: 'layouts',
-    title: 'withLayouts',
+    key: 'react-layouts',
+    title: 'react-layouts',
     description:
-      'Nested layout composition showcase based on @adonis-kit/layouts, including useLayoutProps and context behaviors.',
-    href: '/features/layouts',
-    tags: ['adonis-kit/layouts', 'composition', 'context'],
+      'Nested layout composition showcase based on @adonis-kit/react-layouts, including useLayoutProps and context behaviors.',
+    href: '/features/react-layouts',
+    tags: ['@adonis-kit/react-layouts', 'composition', 'context'],
   },
   {
     key: 'registry',

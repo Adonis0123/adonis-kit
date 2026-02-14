@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 This folder contains publishable libraries under `packages/*`:
 
-- `packages/layouts`: React layout composition utilities (`src/`, tests in `src/__tests__/`, demo in `demo/`).
+- `packages/react-layouts`: React layout composition utilities (`src/`, tests in `src/__tests__/`, demo in `demo/`).
 - `packages/ui`: shadcn-style UI components (`src/components`, shared helpers in `src/lib`, global styles in `src/styles`).
 
 At monorepo root, `apps/web` consumes these packages for showcase/registry usage. Keep package public APIs re-exported from each package `src/index.ts`.
@@ -16,8 +16,8 @@ Run from monorepo root unless noted:
 - `pnpm lint`: Type-check-based lint task in each package.
 - `pnpm typecheck`: Full workspace type checks.
 - `pnpm dev`: Starts workspace dev tasks in parallel.
-- `pnpm -C packages/layouts test`: Runs Vitest suite for `@adonis-kit/layouts`.
-- `pnpm -C packages/layouts dev`: Runs Vite demo server for layouts.
+- `pnpm -C packages/react-layouts test`: Runs Vitest suite for `@adonis-kit/react-layouts`.
+- `pnpm -C packages/react-layouts dev`: Runs Vite demo server for layouts.
 - `pnpm -C packages/ui build`: Bundles UI package with `tsup`.
 
 ## Coding Style & Naming Conventions
@@ -28,15 +28,15 @@ Run from monorepo root unless noted:
 - Add exports in `src/index.ts` whenever introducing new public modules.
 
 ## Testing Guidelines
-- Framework: Vitest (`packages/layouts/vitest.config.ts`), tests matched by `src/__tests__/**/*.test.ts?(x)`.
+- Framework: Vitest (`packages/react-layouts/vitest.config.ts`), tests matched by `src/__tests__/**/*.test.ts?(x)`.
 - Prefer behavior-focused assertions (rendered output, props flow, edge cases).
-- New features in `layouts` should include/adjust tests in `src/__tests__/`.
+- New features in `react-layouts` should include/adjust tests in `src/__tests__/`.
 - `ui` currently has no test suite; add Vitest tests when introducing non-trivial logic.
 
 ## Commit & Pull Request Guidelines
 The repository is currently bootstrap-stage (no commit history yet). Use Conventional Commits from now on:
 
-- `feat(layouts): add nested layout memoization`
+- `feat(react-layouts): add nested layout memoization`
 - `fix(ui): preserve child className in Button asChild mode`
 
-For PRs, include: scope (`layouts`/`ui`/`web`), concise change summary, linked issue (if any), validation commands run, and screenshots for UI-visible changes. Add a Changeset (`pnpm changeset`) for publishable package changes.
+For PRs, include: scope (`react-layouts`/`ui`/`web`), concise change summary, linked issue (if any), validation commands run, and screenshots for UI-visible changes. Add a Changeset (`pnpm changeset`) for publishable package changes.

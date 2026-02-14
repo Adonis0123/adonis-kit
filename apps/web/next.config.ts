@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     externalDir: true,
   },
   outputFileTracingRoot: path.join(__dirname, '../../'),
-  transpilePackages: ['@adonis-kit/layouts', '@adonis-kit/ui'],
+  transpilePackages: ['@adonis-kit/react-layouts', '@adonis-kit/ui'],
 }
 
 export default nextConfig

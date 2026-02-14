@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'adonis-kit registry',
-  description: 'Personal shadcn registry and layouts showcase',
+  description: 'Personal shadcn registry and react-layouts showcase',
 }
 
 export default function RootLayout({
@@ -27,8 +27,8 @@ export default function RootLayout({
               <Link href='/features' className='text-slate-700 hover:text-slate-950'>
                 Features
               </Link>
-              <Link href='/features/layouts' className='text-slate-700 hover:text-slate-950'>
-                withLayouts
+              <Link href='/features/react-layouts' className='text-slate-700 hover:text-slate-950'>
+                react-layouts
               </Link>
               <a href='/registry.json' className='text-slate-700 hover:text-slate-950'>
                 registry.json

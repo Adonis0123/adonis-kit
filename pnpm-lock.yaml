@@ -35,9 +35,9 @@ importers:
 
   apps/web:
     dependencies:
-      '@adonis-kit/layouts':
+      '@adonis-kit/react-layouts':
         specifier: workspace:*
-        version: link:../../packages/layouts
+        version: link:../../packages/react-layouts
       '@adonis-kit/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -70,7 +70,7 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
-  packages/layouts:
+  packages/react-layouts:
     devDependencies:
       '@types/react':
         specifier: ^19.1.0
