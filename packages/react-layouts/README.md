@@ -5,10 +5,26 @@ Declarative layout composition for React. Wrap any page component with nested la
 ## Install
 
 ```bash
+# npm
+npm install @adonis-kit/react-layouts
+
+# yarn
+yarn add @adonis-kit/react-layouts
+
+# pnpm
 pnpm add @adonis-kit/react-layouts
+
+# bun
+bun add @adonis-kit/react-layouts
 ```
 
 > Peer dependency: `react >= 16.9.0`
+
+### shadcn registry
+
+```bash
+pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/react-layouts.json
+```
 
 ## Quick Start
 
