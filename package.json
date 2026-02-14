@@ -1,0 +1,32 @@
+{
+  "name": "react-utils-packages",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@8.10.2",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "dev": "turbo run dev --parallel",
+    "dev:web": "turbo run dev --filter=web --parallel",
+    "build:web": "turbo run build --filter=web",
+    "registry:build": "shadcn build registry.json --output apps/web/public/r --cwd . && cp apps/web/public/r/registry.json apps/web/public/registry.json",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish",
+    "ruler:apply": "pnpm dlx @intellectronica/ruler@latest apply --local-only --no-backup",
+    "skills:sync:claude": "node --experimental-strip-types ./scripts/sync-claude-skills.ts",
+    "postinstall": "pnpm run ruler:apply && pnpm run skills:sync:claude"
+  },
+  "devDependencies": {
+    "is-ci": "^4.1.0",
+    "@changesets/cli": "^2.26.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "shadcn": "latest",
+    "tailwind-merge": "^2.5.5",
+    "turbo": "^2.3.3",
+    "typescript": "^5.3.3"
+  }
+}

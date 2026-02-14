@@ -1,0 +1,77 @@
+:root {
+  --bg-1: #f7f4ed;
+  --bg-2: #e7efe4;
+  --ink: #1f2937;
+  --muted: #4b5563;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Avenir Next', 'PingFang SC', 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top left, var(--bg-1) 0%, var(--bg-2) 62%, #dfe8ff 100%);
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: #ffffff;
+  background: #0f766e;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+main.demo-shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 16px 48px;
+  display: grid;
+  gap: 16px;
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(24px, 4vw, 36px);
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.panel {
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.panel-title {
+  font-weight: 700;
+}
+
+.panel-page {
+  background: #f8fafc;
+}
+
+.panel-l1 {
+  background: #cffafe;
+}
+
+.panel-l2 {
+  background: #bfdbfe;
+}
+
+.panel-l2x {
+  background: #c7d2fe;
+}
+
+.panel-l3 {
+  background: #d1fae5;
+}

@@ -1,0 +1,16 @@
+node_modules
+.turbo
+.next
+dist
+coverage
+.DS_Store
+*.tgz
+*.tsbuildinfo
+# START Ruler Generated Files
+/.codex/config.toml
+/AGENTS.md
+/CLAUDE.md
+# END Ruler Generated Files
+
+/.claude/skills
+/.claude/skills/**
