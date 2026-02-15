@@ -1,0 +1,83 @@
+name: Release Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Select publishable package
+        required: true
+        type: choice
+        options:
+          - '@adonis-kit/react-layouts'
+          - '@adonis-kit/ui'
+      restore_version:
+        description: Restore this published version to latest (e.g. 0.1.3)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Validate restore version format
+        run: |
+          if [[ ! "${{ inputs.restore_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid version format: ${{ inputs.restore_version }}" >&2
+            exit 1
+          fi
+
+      - name: Validate target version exists
+        run: npm view ${{ inputs.package }}@${{ inputs.restore_version }} version
+
+      - name: Capture dist-tags before rollback
+        id: before_tags
+        run: |
+          before_tags="$(npm dist-tag ls ${{ inputs.package }})"
+          {
+            echo "value<<EOF"
+            echo "$before_tags"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Roll back latest dist-tag
+        run: npm dist-tag add ${{ inputs.package }}@${{ inputs.restore_version }} latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Capture dist-tags after rollback
+        id: after_tags
+        run: |
+          after_tags="$(npm dist-tag ls ${{ inputs.package }})"
+          {
+            echo "value<<EOF"
+            echo "$after_tags"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Write rollback summary
+        run: |
+          {
+            echo "## Release Rollback"
+            echo ""
+            echo "- Package: \`${{ inputs.package }}\`"
+            echo "- Restored latest to: \`${{ inputs.restore_version }}\`"
+            echo ""
+            echo "### Dist-tags before"
+            echo "\`\`\`"
+            echo "${{ steps.before_tags.outputs.value }}"
+            echo "\`\`\`"
+            echo ""
+            echo "### Dist-tags after"
+            echo "\`\`\`"
+            echo "${{ steps.after_tags.outputs.value }}"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"

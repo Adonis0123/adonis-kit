@@ -15,6 +15,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish",
+    "release:create-changeset": "node scripts/release/create-changeset.mjs",
+    "release:detect-build-filters": "node scripts/release/detect-build-filters.mjs",
     "ruler:apply": "pnpm dlx @intellectronica/ruler@latest apply --local-only --no-backup",
     "skills:sync:claude": "node --experimental-strip-types ./scripts/sync-claude-skills.ts",
     "postinstall": "pnpm run ruler:apply && pnpm run skills:sync:claude"

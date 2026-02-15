@@ -1,0 +1,82 @@
+name: Release Prepare
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Select publishable package
+        required: true
+        type: choice
+        options:
+          - '@adonis-kit/react-layouts'
+          - '@adonis-kit/ui'
+      bump:
+        description: Select version bump type
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      summary:
+        description: Changeset summary
+        required: false
+        default: manual release via workflow_dispatch
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create changeset
+        id: create_changeset
+        run: node scripts/release/create-changeset.mjs
+        env:
+          RELEASE_PACKAGE: ${{ inputs.package }}
+          RELEASE_BUMP: ${{ inputs.bump }}
+          RELEASE_SUMMARY: ${{ inputs.summary }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+
+      - name: Build selected package
+        run: pnpm turbo run build --filter=${{ inputs.package }}
+
+      - name: Test react-layouts
+        if: inputs.package == '@adonis-kit/react-layouts'
+        run: pnpm -C packages/react-layouts test
+
+      - name: Create release prepare PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(release): prepare ${{ inputs.package }} ${{ inputs.bump }}"
+          title: "chore(release): prepare ${{ inputs.package }} (${{ inputs.bump }})"
+          body: |
+            ## Release Prepare
+            - Package: `${{ inputs.package }}`
+            - Bump: `${{ inputs.bump }}`
+            - Summary: `${{ inputs.summary }}`
+            - Changeset: `${{ steps.create_changeset.outputs.changeset_path }}`
+          branch: "codex/release-prepare-${{ steps.create_changeset.outputs.package_slug }}-${{ github.run_id }}-${{ github.run_attempt }}"
+          delete-branch: true
