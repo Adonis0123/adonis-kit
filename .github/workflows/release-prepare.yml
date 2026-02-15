@@ -78,5 +78,5 @@ jobs:
             - Bump: `${{ inputs.bump }}`
             - Summary: `${{ inputs.summary }}`
             - Changeset: `${{ steps.create_changeset.outputs.changeset_path }}`
-          branch: "codex/release-prepare-${{ steps.create_changeset.outputs.package_slug }}-${{ github.run_id }}-${{ github.run_attempt }}"
+          branch: "release-prepare-${{ steps.create_changeset.outputs.package_slug }}-${{ github.run_id }}-${{ github.run_attempt }}"
           delete-branch: true
