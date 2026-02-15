@@ -8,7 +8,7 @@
 
 如果你要把本流程迁移到其他仓库，请参考：
 
-- `docs/release-migration-guide.md`
+- `.docs/release-migration-guide.md`
 
 ## 1. 发布目标与包白名单
 
@@ -25,6 +25,23 @@
 
 - `NPM_TOKEN`：必须，具备 npm publish 和 dist-tag 修改权限
 - `GITHUB_TOKEN`：GitHub Actions 自动注入（默认可用）
+- `Settings -> Actions -> General -> Workflow permissions` 设为 `Read and write permissions`
+- 勾选 `Allow GitHub Actions to create and approve pull requests`（`Release Prepare` 创建 PR 必需）
+
+Changesets 配置必须包含以下两点：
+
+1. 启用 changelog 生成（供 `changesets/action` 读取）
+2. 私有包不参与 version/tag（避免私有包误升版）
+
+```json
+{
+  "changelog": "@changesets/cli/changelog",
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
+}
+```
 
 ## 3. 工作流说明
 
@@ -43,10 +60,11 @@
 执行内容：
 
 1. 安装依赖
-2. 自动生成 `.changeset/release-<pkg>-<runid>-<attempt>.md`
-3. 仅构建选中包：`pnpm turbo run build --filter=<package>`
-4. 若选中 `@adonis-kit/react-layouts`，额外运行测试：`pnpm -C packages/react-layouts test`
-5. 自动创建 PR（分支名：`codex/release-prepare-<slug>-<runid>-<attempt>`）
+2. 执行发布配置校验：`node scripts/release/validate-changeset-config.mjs`
+3. 自动生成 `.changeset/release-<pkg>-<runid>-<attempt>.md`
+4. 仅构建选中包：`pnpm turbo run build --filter=<package>`
+5. 若选中 `@adonis-kit/react-layouts`，额外运行测试：`pnpm -C packages/react-layouts test`
+6. 自动创建 PR（分支名：`release-prepare-<slug>-<runid>-<attempt>`）
 
 ### 3.2 `Release`（自动入口）
 
@@ -57,8 +75,9 @@
 执行内容：
 
 1. 安装依赖
-2. 固定构建发布包（`@adonis-kit/react-layouts` 与 `@adonis-kit/ui`）
-3. 执行 `changesets/action@v1`
+2. 执行发布配置校验：`node scripts/release/validate-changeset-config.mjs`
+3. 固定构建发布包（`@adonis-kit/react-layouts` 与 `@adonis-kit/ui`）
+4. 执行 `changesets/action@v1`
    - `version: pnpm version-packages`
    - `publish: pnpm release`
 
@@ -113,6 +132,33 @@
 ### Q3：回退是否会删除 npm 已发布版本？
 
 不会。当前策略是“安全回退”，只修改 `latest` dist-tag 指向，不执行 `unpublish`。
+
+### Q4：`Release Prepare` 报错 `GitHub Actions is not permitted to create or approve pull requests`
+
+说明当前仓库（或组织）未允许 Actions 创建 PR。  
+在仓库或组织设置中开启：
+
+- `Workflow permissions = Read and write permissions`
+- `Allow GitHub Actions to create and approve pull requests`
+
+### Q5：`Release` 报错 `ENOENT ... apps/web/CHANGELOG.md`
+
+常见原因：
+
+1. `.changeset/config.json` 把 `changelog` 设成了 `false`
+2. 未配置 `privatePackages` 导致私有包被误升版
+
+请确保配置如下：
+
+```json
+{
+  "changelog": "@changesets/cli/changelog",
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
+}
+```
 
 ## 6. 边界与约束
 

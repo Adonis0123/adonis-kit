@@ -22,20 +22,23 @@
 2. `.github/workflows/release-prepare.yml`
 3. `.github/workflows/release-rollback.yml`
 4. `scripts/release/create-changeset.mjs`
+5. `scripts/release/validate-changeset-config.mjs`
 
 可选复制：
 
-5. 根目录 `package.json` 中脚本别名
+6. 根目录 `package.json` 中脚本别名
    - `release:create-changeset`
+   - `release:validate-config`
 
 ## 3. 必改配置（迁移时最容易漏）
 
 ## 3.1 包白名单
 
-需要同时修改 2 处，保持一致：
+需要同时修改 3 处，保持一致：
 
 1. `release-prepare.yml` 的下拉选项 `inputs.package.options`
 2. `create-changeset.mjs` 的 `ALLOWED_PACKAGES`
+3. `release.yml` 里 `Build publishable packages` 的 `--filter=<pkg>` 列表
 
 ## 3.3 分支与权限
 
@@ -59,6 +62,30 @@
 
 - `NPM_TOKEN`
 - `GITHUB_TOKEN`（通常默认可用）
+
+同时需要开启 Actions PR 权限：
+
+- `Settings -> Actions -> General -> Workflow permissions = Read and write permissions`
+- `Allow GitHub Actions to create and approve pull requests`
+
+## 4.1 Changesets 私有包配置（必配）
+
+在 `.changeset/config.json` 设置：
+
+```json
+{
+  "changelog": "@changesets/cli/changelog",
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
+}
+```
+
+否则可能出现：
+
+- 私有包被升版并触发 `ENOENT .../CHANGELOG.md`（如 `apps/web/CHANGELOG.md`）
+- 或因 `changelog: false` 导致发布包缺少 `CHANGELOG.md`（如 `packages/react-layouts/CHANGELOG.md`）
 
 ## 5. 推荐迁移步骤
 

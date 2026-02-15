@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Validate changeset config
+        run: node scripts/release/validate-changeset-config.mjs
+
       - name: Build publishable packages
         run: pnpm turbo run build --filter=@adonis-kit/react-layouts --filter=@adonis-kit/ui
 

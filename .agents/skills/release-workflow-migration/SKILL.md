@@ -31,6 +31,7 @@ version: 1.0.0
 3. 发布包白名单（npm 包名 + 目录前缀）
 4. 默认分支名称（默认 `main`）
 5. 是否需要单包测试步骤
+6. 是否已允许 GitHub Actions 创建 PR（Release Prepare 必需）
 
 ## 实施步骤
 
@@ -42,6 +43,7 @@ version: 1.0.0
 - `.github/workflows/release-prepare.yml`
 - `.github/workflows/release-rollback.yml`
 - `scripts/release/create-changeset.mjs`
+- `scripts/release/validate-changeset-config.mjs`
 
 ### 2. 替换白名单配置
 
@@ -55,6 +57,7 @@ version: 1.0.0
 
 默认命令：
 
+- 配置校验：`node scripts/release/validate-changeset-config.mjs`
 - 自动发布构建：`pnpm turbo run build --filter=<pkg-a> --filter=<pkg-b> ...`
 - 手动准备发布构建：`pnpm turbo run build --filter=<package>`
 - 单测（示例）：`pnpm -C packages/react-layouts test`
@@ -68,15 +71,37 @@ version: 1.0.0
 - `on.push.branches`
 - `permissions`
 - `concurrency`
+- `Settings -> Actions -> General -> Workflow permissions = Read and write permissions`
+- `Allow GitHub Actions to create and approve pull requests`
 
-### 5. 配置 Secrets
+### 5. 校正 Changesets 私有包策略
+
+在 `.changeset/config.json` 添加并确认：
+
+```json
+{
+  "changelog": "@changesets/cli/changelog",
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
+}
+```
+
+目的：
+
+- 确保 `changesets/action` 可读取发布包 changelog
+- 避免私有 workspace 包被 `changeset version` 误升版
+- 防止出现 `ENOENT .../CHANGELOG.md`
+
+### 6. 配置 Secrets
 
 目标仓库至少需要：
 
 - `NPM_TOKEN`
 - `GITHUB_TOKEN`（Actions 默认提供）
 
-### 6. 执行验证
+### 7. 执行验证
 
 按顺序验证：
 
@@ -97,6 +122,6 @@ version: 1.0.0
 
 ## 参考
 
-- 迁移文档：`docs/release-migration-guide.md`
-- 流程文档：`docs/release-workflow.md`
+- 迁移文档：`.docs/release-migration-guide.md`
+- 流程文档：`.docs/release-workflow.md`
 - 检查清单：`references/migration-checklist.md`
