@@ -112,6 +112,10 @@ jobs:
         if: inputs.package == '@adonis-kit/react-layouts'
         run: pnpm -C packages/react-layouts test
 
+      - name: Generate branch date (UTC)
+        id: branch_date
+        run: echo "yyyymmdd=$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
+
       - name: Create release prepare PR
         uses: peter-evans/create-pull-request@v6
         with:
@@ -124,5 +128,5 @@ jobs:
             - Summary: `${{ inputs.summary }}`
             - Changeset file (consumed by `pnpm version-packages`): `${{ steps.create_changeset.outputs.changeset_path }}`
             - This PR should include package version and changelog updates.
-          branch: "release-prepare-${{ steps.create_changeset.outputs.package_slug }}-${{ github.run_id }}-${{ github.run_attempt }}"
+          branch: "release-prepare-${{ steps.create_changeset.outputs.package_slug }}-${{ steps.branch_date.outputs.yyyymmdd }}-${{ github.run_id }}-${{ github.run_attempt }}"
           delete-branch: true
