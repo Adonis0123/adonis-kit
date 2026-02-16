@@ -26,6 +26,14 @@ bun add @adonis-kit/react-layouts
 pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/react-layouts.json
 ```
 
+## Live Demo
+
+Explore the runtime-split demos online:
+
+- Feature hub: https://adonis-kit.vercel.app/features/react-layouts
+- Client showcase: https://adonis-kit.vercel.app/features/react-layouts/showcase-client
+- Server showcase: https://adonis-kit.vercel.app/features/react-layouts/showcase-server
+
 ## Entry Points
 
 | Entry | Runtime | Purpose |
