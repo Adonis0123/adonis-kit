@@ -1,4 +1,4 @@
-# Release Workflow 迁移检查清单
+# Release Workflow 迁移检查清单（单发布 PR 版）
 
 ## A. 文件迁移
 
@@ -15,7 +15,16 @@
 - [ ] 更新 `create-changeset.mjs` 中 `ALLOWED_PACKAGES`
 - [ ] 更新 `release.yml` 中 `Build publishable packages` 的 `--filter=<pkg>` 列表
 
-## C. 命令适配
+## C. Workflow 行为校正
+
+- [ ] `Release Prepare` 已包含并发拦截（存在 open release PR 时失败）
+- [ ] `Release Prepare` 已在生成 changeset 后执行 `pnpm version-packages`
+- [ ] `Release Prepare` 生成的 PR 为单发布 PR（含版本号/changelog 变更）
+- [ ] `Release` 已接入 `.changeset/*.md` 残留检查（有残留直接失败）
+- [ ] `Release` 使用 `changesets/action@v1` 且仅执行 `publish: pnpm release`
+- [ ] `Release` 已显式开启 `createGithubReleases: true`
+
+## D. 命令适配
 
 - [ ] 构建命令已适配（pnpm/turbo 或其他）
 - [ ] 单包测试命令已适配或移除
@@ -25,31 +34,33 @@
 - [ ] 若使用脚本别名，workflow 与 `package.json` 脚本名保持一致
 - [ ] 若启用动态过滤，`detect-build-filters.mjs` 输出已被 workflow 实际消费
 
-## D. 平台配置
+## E. 平台配置
 
 - [ ] `on.push.branches` 与目标默认分支一致
+- [ ] `release-prepare.yml` 中 open release PR 检查的 `base` 与目标默认分支一致（避免硬编码 `main`）
 - [ ] `permissions` 满足最小权限要求
 - [ ] `concurrency` 策略符合团队约定
 - [ ] Actions Secrets 已配置 `NPM_TOKEN`
 - [ ] `Workflow permissions` 已设为 `Read and write permissions`
 - [ ] 已启用 `Allow GitHub Actions to create and approve pull requests`
 
-## E. Changesets 配置
+## F. Changesets 配置
 
 - [ ] `.changeset/config.json` 已设置 `changelog = "@changesets/cli/changelog"`
 - [ ] `.changeset/config.json` 已设置 `privatePackages.version = false`
 - [ ] `.changeset/config.json` 已设置 `privatePackages.tag = false`
 
-## F. 验证流程
+## G. 验证流程
 
-- [ ] 手动跑 `Release Prepare`，并生成 changeset PR
-- [ ] 合并后 `Release` 创建/更新版本 PR
-- [ ] 合并版本 PR 后发布成功
+- [ ] 手动跑 `Release Prepare`，并生成单发布 PR
+- [ ] 发布 PR 包含目标包版本号与 changelog 更新
+- [ ] 合并发布 PR 后 `Release` 可完成 npm publish
+- [ ] 发布后可看到自动生成的 GitHub Release
 - [ ] `Release Rollback` 可回退 `latest` 到指定历史版本
 - [ ] （动态过滤场景）单包改动时只构建目标包
 - [ ] （动态过滤场景）共享文件改动时会构建全部白名单包
 
-## G. 回归与风险
+## H. 回归与风险
 
 - [ ] 每次发布都会构建发布白名单包（保守稳定策略）
 - [ ] 白名单外包不会被误发布

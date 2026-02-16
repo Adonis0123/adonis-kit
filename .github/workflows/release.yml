@@ -20,6 +20,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Guard against pending changeset files
+        run: |
+          pending_changesets="$(find .changeset -maxdepth 1 -type f -name '*.md' ! -name 'README.md' | sort)"
+          if [ -n "$pending_changesets" ]; then
+            echo "Found unconsumed changeset files:"
+            echo "$pending_changesets"
+            echo "Release is blocked. Use Release Prepare to consume changesets via pnpm version-packages first."
+            exit 1
+          fi
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
@@ -38,11 +48,11 @@ jobs:
       - name: Build publishable packages
         run: pnpm turbo run build --filter=@adonis-kit/react-layouts --filter=@adonis-kit/ui
 
-      - name: Create release PR or publish
+      - name: Publish packages and create GitHub Releases
         uses: changesets/action@v1
         with:
-          version: pnpm version-packages
           publish: pnpm release
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

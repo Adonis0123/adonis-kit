@@ -38,6 +38,45 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Ensure no open release PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const defaultBranch = context.payload.repository?.default_branch ?? 'main'
+
+            const { data: pulls } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              base: defaultBranch,
+              per_page: 100,
+            })
+
+            const blockers = pulls.filter((pr) => {
+              const title = pr.title ?? ''
+              const headRef = pr.head?.ref ?? ''
+              return (
+                title.startsWith('chore(release):') ||
+                headRef.startsWith('release-prepare-') ||
+                headRef.startsWith('changeset-release/')
+              )
+            })
+
+            if (blockers.length === 0) {
+              core.info(`No blocking release PR found on base branch "${defaultBranch}".`)
+              return
+            }
+
+            const summary = blockers
+              .map((pr) => `#${pr.number} ${pr.title} (${pr.html_url})`)
+              .join('\n')
+
+            core.setFailed(
+              `Found open release PR(s) targeting "${defaultBranch}". Merge/close them before running Release Prepare again:\n${summary}`
+            )
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
@@ -63,6 +102,9 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
 
+      - name: Apply version changes
+        run: pnpm version-packages
+
       - name: Build selected package
         run: pnpm turbo run build --filter=${{ inputs.package }}
 
@@ -80,6 +122,7 @@ jobs:
             - Package: `${{ inputs.package }}`
             - Bump: `${{ inputs.bump }}`
             - Summary: `${{ inputs.summary }}`
-            - Changeset: `${{ steps.create_changeset.outputs.changeset_path }}`
+            - Changeset file (consumed by `pnpm version-packages`): `${{ steps.create_changeset.outputs.changeset_path }}`
+            - This PR should include package version and changelog updates.
           branch: "release-prepare-${{ steps.create_changeset.outputs.package_slug }}-${{ github.run_id }}-${{ github.run_attempt }}"
           delete-branch: true

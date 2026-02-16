@@ -14,8 +14,15 @@
 - `NPM_TOKEN`：建议 npm automation token，具备发布权限
 - `GITHUB_TOKEN`：GitHub Actions 自动提供，无需手工创建
 
-当前 npm 发布工作流文件：`.github/workflows/release.yml`
-触发条件：`push` 到 `main` 分支。
+当前 npm 发布 workflow：
+
+- `.github/workflows/release-prepare.yml`
+- `.github/workflows/release.yml`
+
+触发方式：
+
+- `Release Prepare`：手动 `workflow_dispatch`
+- `Release`：`push` 到 `main`
 
 ### 1.2 Vercel（用于 web 与 registry 访问）
 
@@ -39,16 +46,16 @@ Vercel Project 建议配置：
 
 ## 2. 先判断这次改动走哪条链路
 
-| 改动类型 | 需要 `pnpm changeset` | 需要 `pnpm registry:build` | 主要发布结果 |
+| 改动类型 | 需要发布准备 PR | 需要 `pnpm registry:build` | 主要发布结果 |
 | --- | --- | --- | --- |
 | 仅改 `packages/react-layouts` / `packages/ui`（对外包能力变化） | 是 | 否 | npm 新版本 |
 | 仅改 `registry/**` / `registry.json` | 否 | 是 | Vercel 上 `/r/*.json` 更新 |
 | 仅改 `apps/web/**` 页面展示 | 否 | 否（除非改了 registry 源） | Vercel 站点更新 |
 | 同时改包与 registry/web | 是 | 是 | npm + Vercel 都更新 |
 
-## 3. npm 发布流程（Changesets + CI）
+## 3. npm 发布流程（单发布 PR）
 
-### 步骤 1：本地校验
+### 步骤 1：本地校验（推荐）
 
 ```bash
 pnpm install
@@ -57,32 +64,37 @@ pnpm test
 pnpm typecheck
 ```
 
-### 步骤 2：仅在"包发布"场景生成 changeset
+### 步骤 2：触发 `Release Prepare`
 
-```bash
-pnpm changeset
-```
+在 GitHub Actions 手动运行 `Release Prepare`：
 
-为受影响包选择版本级别（patch/minor/major）。
+- 选择 `package`
+- 选择 `patch/minor/major`
+- 可填写 `summary`
 
-### 步骤 3：提交 PR 并合并到 `main`
+`Release Prepare` 会自动完成：
 
-```bash
-git add .
-git commit -m "feat(ui): ..."
-git push
-```
+1. 生成 changeset
+2. 执行 `pnpm version-packages`
+3. 构建/测试
+4. 创建单发布 PR（包含版本号与 changelog 变更）
 
-合并到 `main` 后，`release.yml` 会运行：
+### 步骤 3：审核并合并发布 PR
 
-1. 安装依赖
-2. 构建可发布包（`@adonis-kit/react-layouts`、`@adonis-kit/ui`）
-3. 执行 `changesets/action`
+PR 验收要点：
 
-### 步骤 4：发布行为说明
+- 目标包 `package.json` 版本已变化
+- 目标包 changelog 已更新
+- CI 通过
 
-- 有未消费 changeset：创建或更新 Release PR
-- 合并 Release PR 后：自动 `npm publish`
+### 步骤 4：等待 `Release` 自动发布
+
+合并到 `main` 后，`release.yml` 自动执行：
+
+1. 检查是否存在未消费 `.changeset/*.md`
+2. 构建发布包（`@adonis-kit/react-layouts`、`@adonis-kit/ui`）
+3. `changesets/action` 执行 `publish: pnpm release`
+4. 自动创建 GitHub Release
 
 ### 步骤 5：发布后检查
 
@@ -131,14 +143,17 @@ pnpm install
 pnpm build
 pnpm test
 pnpm typecheck
-pnpm changeset
 pnpm registry:build
 git add .
 git commit -m "feat: ..."
 git push
 ```
 
-然后通过 PR 合并到 `main`，让两条链路各自完成自动发布。
+然后：
+
+1. 跑 `Release Prepare` 生成单发布 PR（npm）
+2. 合并应用 PR（Vercel）
+3. 合并发布 PR（npm）
 
 ## 6. 手动兜底（仅 CI 异常时）
 
@@ -149,6 +164,7 @@ pnpm install
 pnpm build
 pnpm test
 pnpm typecheck
+pnpm changeset
 pnpm version-packages
 pnpm release
 ```
@@ -169,7 +185,12 @@ pnpm release
 - 这是正常隔离现象：`release.yml` 只处理 npm 包
 - 优先查看 `.github/workflows/release.yml` 的执行日志
 
-### Q3: `shadcn add` 报 404
+### Q3: `Release` 报错 `Found unconsumed changeset files`
+
+- 说明 `main` 存在未消费 `.changeset/*.md`
+- 请通过 `Release Prepare` 重新生成并消费 changeset，不要直接把 changeset 文件合到 `main`
+
+### Q4: `shadcn add` 报 404
 
 - 是否执行并提交了 `pnpm registry:build` 产物
 - 是否部署到了正确域名

@@ -2,8 +2,8 @@
 
 本文档用于将当前仓库的 Changesets 发布体系迁移到其他仓库，目标是快速复用以下能力：
 
-- 手动选择包与 `patch/minor/major` 生成 changeset（`Release Prepare`）
-- `push main` 自动发布（`Release`）
+- 手动选择包与 `patch/minor/major` 生成单发布 PR（`Release Prepare`）
+- `push main` 自动发布 npm 包并创建 GitHub Release（`Release`）
 - 发布异常后回退 npm `latest` 标签（`Release Rollback`）
 
 ## 1. 适用前提
@@ -32,7 +32,7 @@
 
 ## 3. 必改配置（迁移时最容易漏）
 
-## 3.1 包白名单
+### 3.1 包白名单
 
 需要同时修改 3 处，保持一致：
 
@@ -40,15 +40,34 @@
 2. `create-changeset.mjs` 的 `ALLOWED_PACKAGES`
 3. `release.yml` 里 `Build publishable packages` 的 `--filter=<pkg>` 列表
 
-## 3.3 分支与权限
+### 3.2 单发布 PR 关键行为
+
+迁移时必须确保 `Release Prepare` 包含：
+
+1. 生成 changeset
+2. 执行 `pnpm version-packages`
+3. 产出可直接合并的发布 PR（带版本号与 changelog）
+4. 并发保护（已有未合并 release PR 时直接失败）
+
+### 3.3 `Release` 行为约束
+
+迁移时必须确保 `Release`：
+
+1. 先做 `.changeset/*.md` 残留检查（有残留直接失败）
+2. 使用 `changesets/action@v1` 执行 `publish: pnpm release`
+3. 开启 `createGithubReleases: true`
+4. 不再执行 `version`（版本变更已由 `Release Prepare` 完成）
+
+### 3.4 分支与权限
 
 根据目标仓库修改：
 
 - `on.push.branches`（`main` 或 `master`）
+- `release-prepare.yml` 中 open release PR 检查的 `base`（应与目标默认分支一致，建议使用 `github.event.repository.default_branch`，避免硬编码）
 - `permissions`（建议最小化）
 - `concurrency`（避免重复发布任务竞争）
 
-## 3.4 构建与测试命令
+### 3.5 构建与测试命令
 
 若目标仓库不是 `pnpm + turbo`，需替换：
 
@@ -85,7 +104,7 @@
 否则可能出现：
 
 - 私有包被升版并触发 `ENOENT .../CHANGELOG.md`（如 `apps/web/CHANGELOG.md`）
-- 或因 `changelog: false` 导致发布包缺少 `CHANGELOG.md`（如 `packages/react-layouts/CHANGELOG.md`）
+- 或因 `changelog: false` 导致发布包缺少 `CHANGELOG.md`
 
 ## 5. 推荐迁移步骤
 
@@ -93,25 +112,25 @@
 2. 修改白名单、路径映射、构建命令、分支策略
 3. 提交 PR 并完成代码评审
 4. 合并后手动运行一次 `Release Prepare`
-5. 观察 `Release` 的版本 PR 与后续 publish 是否正常
-6. 在非生产包上演练一次 `Release Rollback`
+5. 确认生成的发布 PR 已包含版本号与 changelog 变更
+6. 合并发布 PR，确认 `Release` 完成 npm publish + GitHub Release
+7. 在非生产包上演练一次 `Release Rollback`
 
 ## 6. 验收标准
 
 满足以下条件即视为迁移成功：
 
-1. `Release Prepare` 可创建带 `.changeset/*.md` 的 PR
-2. `Release` 可创建/更新版本 PR
-3. 合并版本 PR 后可发布 npm 新版本
-4. 每次发布都会先构建发布白名单包（保守稳定策略）
+1. `Release Prepare` 可创建单发布 PR（不是 only-changeset PR）
+2. 发布 PR 中含目标包版本号与 changelog 更新
+3. 合并发布 PR 后 `Release` 可完成 npm 发布
+4. 发布后仓库可看到自动生成的 GitHub Release
 5. `Release Rollback` 可恢复 `latest` 到指定历史版本
 
 ## 7. 常见迁移问题
 
 ### Q1：仍然一直是 `0.0.0`
 
-根因通常是没有生成 changeset。  
-先触发 `Release Prepare` 或手工添加 `.changeset/*.md`。
+根因通常是混淆了根包版本与子包版本。根目录版本不会跟随 npm 子包发布变化。请检查 `packages/*/package.json`。
 
 ### Q2：Workflow 校验报 YAML 类型错误
 
@@ -121,7 +140,11 @@
 title: "chore(release): prepare ${{ inputs.package }} (${{ inputs.bump }})"
 ```
 
-### Q3：回退失败
+### Q3：`Release` 报 `Found unconsumed changeset files`
+
+说明主分支存在未消费 `.changeset/*.md`。请通过 `Release Prepare -> version-packages -> PR` 的标准路径重新生成发布 PR。
+
+### Q4：回退失败
 
 先确认版本存在：
 

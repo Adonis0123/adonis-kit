@@ -1,7 +1,7 @@
 ---
 name: release-workflow-migration
-description: Use when migrating this repository's Changesets release workflow (Release, Release Prepare, Release Rollback) to another project. Includes package whitelist adaptation, workflow setup, script migration, and validation checklist.
-version: 1.1.0
+description: Use when migrating this repository's single-release-PR Changesets workflow (Release Prepare, Release, Release Rollback) to another project. Includes package whitelist adaptation, workflow setup, script migration, and validation checklist.
+version: 2.0.0
 ---
 
 # Release Workflow Migration
@@ -13,14 +13,16 @@ version: 1.1.0
 - 用户要求将当前发布流程迁移到另一个仓库
 - 用户要求复用 `Release Prepare` + `Release` + `Release Rollback`
 - 用户要求支持按包选择发版与失败后的安全回退
+- 用户希望采用“单发布 PR + 自动 GitHub Release”
 
 ## 迁移目标
 
 在目标仓库落地以下能力：
 
-1. 手动准备发布：选择包和 `patch/minor/major`，自动生成 changeset 并开 PR
-2. 自动发布：`push` 到主分支后，固定构建发布白名单包并执行 Changesets 两阶段发布
-3. 安全回退：仅回退 npm `latest` dist-tag，不执行 `unpublish`
+1. 手动准备发布：选择包和 `patch/minor/major`，自动生成 changeset、执行升版并创建单发布 PR
+2. 自动发布：`push` 到主分支后，固定构建发布白名单包并执行 publish
+3. 自动发布记录：发布后自动创建 GitHub Release
+4. 安全回退：仅回退 npm `latest` dist-tag，不执行 `unpublish`
 
 ## 必需输入
 
@@ -32,6 +34,7 @@ version: 1.1.0
 4. 默认分支名称（默认 `main`）
 5. 是否需要单包测试步骤
 6. 是否已允许 GitHub Actions 创建 PR（Release Prepare 必需）
+7. 是否需要自动 GitHub Release（本 skill 默认开启）
 
 ## 实施步骤
 
@@ -57,7 +60,24 @@ version: 1.1.0
 2. `create-changeset.mjs` 的 `ALLOWED_PACKAGES`
 3. `release.yml` 的 `Build publishable packages` 中 `--filter=<pkg>` 列表
 
-### 3. 校正构建与测试命令
+### 3. 校正 workflow 行为
+
+`Release Prepare` 必须具备：
+
+- 并发拦截：已有未合并 release PR 时直接失败
+- 生成 changeset
+- 执行 `pnpm version-packages`
+- 构建 + 可选测试
+- 创建单发布 PR（PR 内应有版本号/changelog 变更）
+
+`Release` 必须具备：
+
+- `.changeset/*.md` 残留检查（有残留直接失败）
+- 发布前构建发布白名单包
+- `changesets/action@v1` 仅执行 `publish: pnpm release`
+- `createGithubReleases: true`
+
+### 3.1 校正构建与测试命令
 
 默认命令：
 
@@ -68,7 +88,7 @@ version: 1.1.0
 
 如果目标仓库不是 pnpm/turbo，替换为对应命令。
 
-### 3.1 脚本别名与 workflow 调用方式（避免迁移误解）
+### 3.2 脚本别名与 workflow 调用方式（避免迁移误解）
 
 当前仓库 `package.json` 提供了：
 
@@ -88,6 +108,7 @@ version: 1.1.0
 检查以下项并按目标仓库策略调整：
 
 - `on.push.branches`
+- `release-prepare.yml` 中 open release PR 检查的 `base`（应跟随目标默认分支，避免硬编码）
 - `permissions`
 - `concurrency`
 - `Settings -> Actions -> General -> Workflow permissions = Read and write permissions`
@@ -125,9 +146,9 @@ version: 1.1.0
 按顺序验证：
 
 1. 运行 `Release Prepare`（单包 + patch）
-2. 确认自动 PR 包含 `.changeset/*.md`
-3. 合并后确认 `Release` 创建/更新版本 PR
-4. 合并版本 PR 后确认 npm 发布成功
+2. 确认自动 PR 包含目标包版本号与 changelog 变更
+3. 合并后确认 `Release` 完成 npm 发布
+4. 确认仓库自动生成 GitHub Release
 5. 运行 `Release Rollback`，确认 `latest` 可恢复到指定历史版本
 
 如启用动态构建过滤（`detect-build-filters.mjs`）再额外验证：

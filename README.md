@@ -127,6 +127,20 @@ pnpm version-packages   # Apply changesets to bump versions
 pnpm release            # Publish to npm (public access)
 ```
 
+## Release Workflow (GitHub Actions)
+
+Recommended release path:
+
+1. Run `Release Prepare` in GitHub Actions (`package` + `bump` + optional `summary`).
+2. Review and merge the generated single release PR (it should include package version and changelog updates).
+3. `Release` runs on `main`, publishes with Changesets, and creates GitHub Releases automatically.
+
+Notes:
+
+- Release PR concurrency is blocked by default: if an open release PR exists, `Release Prepare` fails fast.
+- `Release` blocks publishing when unconsumed `.changeset/*.md` files exist on `main`.
+- `Release Rollback` remains available for restoring the npm `latest` dist-tag safely.
+
 ## Vercel Setup
 
 - Project Root Directory: `apps/web`
