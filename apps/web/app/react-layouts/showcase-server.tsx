@@ -11,6 +11,14 @@ import {
   CardTitle,
 } from '@adonis-kit/ui'
 
+const serverCompositionOrderSnippet = `withServerLayouts(Page, [Layout1, Layout2])
+
+<Layout2>
+  <Layout1>
+    <Page />
+  </Layout1>
+</Layout2>`
+
 const serverUsageSnippet = `import { withServerLayouts, type ServerLayoutComponent } from '@adonis-kit/react-layouts/server'
 
 type PageProps = { title: string }
@@ -91,6 +99,17 @@ export async function ReactLayoutsServerDemo() {
           Server entry demo for <code>@adonis-kit/react-layouts/server</code>.
         </p>
       </header>
+
+      <section className='grid gap-3'>
+        <h3 className='text-lg font-medium'>Composition Order</h3>
+        <p className='text-sm text-slate-500'>
+          <code>withServerLayouts</code> uses <code>inside-out composition</code>;{' '}
+          <code>array tail is outermost layout</code>.
+        </p>
+        <pre className='overflow-x-auto rounded bg-slate-900 p-3 text-xs text-slate-100'>
+          <code>{serverCompositionOrderSnippet}</code>
+        </pre>
+      </section>
 
       <section className='grid gap-3'>
         <h3 className='text-lg font-medium'>Runtime Demo</h3>

@@ -36,6 +36,38 @@ pnpm dlx shadcn@latest add https://adonis-kit.vercel.app/r/react-layouts.json
 
 ## Quick Start
 
+### Composition Order (Inside-Out)
+
+Both composition APIs follow the same rule: `inside-out composition`; `array tail is outermost layout`.
+
+#### Client
+
+```tsx
+withLayouts(Page, [Layout1, Layout2])
+```
+
+```tsx
+<Layout2>
+  <Layout1>
+    <Page />
+  </Layout1>
+</Layout2>
+```
+
+#### Server
+
+```tsx
+withServerLayouts(Page, [Layout1, Layout2])
+```
+
+```tsx
+<Layout2>
+  <Layout1>
+    <Page />
+  </Layout1>
+</Layout2>
+```
+
 ### Client Example
 
 ```tsx
@@ -130,7 +162,7 @@ export const ServerPage = withServerLayouts(Page, [serverPageLayout])
 
 #### `withLayouts(Page, Layouts, options?)`
 
-Composes a page component with an array of layout wrappers. Layouts nest inside-out.
+Composes a page component with an array of layout wrappers. See [Composition Order (Inside-Out)](#composition-order-inside-out) for `inside-out composition` semantics (`array tail is outermost layout`).
 
 #### `useLayoutProps(component?)`
 
@@ -144,7 +176,7 @@ Returns all component props as `ReadonlyMap<ComponentType, unknown>`.
 
 #### `withServerLayouts(Page, Layouts, options?)`
 
-Composes a server page with server layouts. Each layout receives:
+Composes a server page with server layouts. See [Composition Order (Inside-Out)](#composition-order-inside-out) for `inside-out composition` semantics (`array tail is outermost layout`). Each layout receives:
 
 ```ts
 {

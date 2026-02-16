@@ -5,6 +5,14 @@ import { useState } from 'react'
 import { useAllLayoutProps, useLayoutProps, withLayouts } from '@adonis-kit/react-layouts/client'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@adonis-kit/ui'
 
+const clientCompositionOrderSnippet = `withLayouts(Page, [Layout1, Layout2])
+
+<Layout2>
+  <Layout1>
+    <Page />
+  </Layout1>
+</Layout2>`
+
 // ─── Example 1: Basic ────────────────────────────────────────────────────────
 
 interface BasicPageProps {
@@ -55,7 +63,7 @@ const Sidebar: React.FC<React.PropsWithChildren> = ({ children }) => {
     <Card className='border-emerald-300 bg-emerald-50'>
       <CardHeader>
         <CardTitle>Sidebar</CardTitle>
-        <CardDescription>Outermost layout wraps Header and Page.</CardDescription>
+        <CardDescription>Layout chrome with a simple navigation shell.</CardDescription>
       </CardHeader>
       <CardContent className='flex gap-4'>
         <nav className='w-24 shrink-0 rounded bg-emerald-100 p-2 text-xs text-emerald-700'>
@@ -162,10 +170,21 @@ export function ReactLayoutsClientDemo({ compact = false }: { compact?: boolean 
       )}
 
       <section className='grid gap-3'>
+        <h3 className='text-lg font-medium'>Composition Order</h3>
+        <p className='text-sm text-slate-500'>
+          <code>withLayouts</code> uses <code>inside-out composition</code>;{' '}
+          <code>array tail is outermost layout</code>.
+        </p>
+        <pre className='overflow-x-auto rounded bg-slate-900 p-3 text-xs text-slate-100'>
+          <code>{clientCompositionOrderSnippet}</code>
+        </pre>
+      </section>
+
+      <section className='grid gap-3'>
         <h3 className='text-lg font-medium'>Basic - Page + Named Layouts</h3>
         <p className='text-sm text-slate-500'>
-          <code>withLayouts(BasicPage, [Header, Sidebar])</code> where Header reads page props
-          and Sidebar wraps everything.
+          Built on the Composition Order rule above. This demo focuses on{' '}
+          <code>useLayoutProps(BasicPage)</code> and page-prop-driven layout UI.
         </p>
         <div>
           <Button
@@ -182,8 +201,9 @@ export function ReactLayoutsClientDemo({ compact = false }: { compact?: boolean 
       <section className='grid gap-3'>
         <h3 className='text-lg font-medium'>Advanced - No-arg Hook, AllProps, Nested Composition</h3>
         <p className='text-sm text-slate-500'>
-          <code>useLayoutProps&lt;T&gt;()</code> without argument,{' '}
-          <code>useAllLayoutProps()</code>, and nested <code>withLayouts</code>.
+          Also follows the Composition Order rule above, then adds{' '}
+          <code>useLayoutProps&lt;T&gt;()</code>, <code>useAllLayoutProps()</code>, and nested{' '}
+          <code>withLayouts</code>.
         </p>
         <div>
           <Button
