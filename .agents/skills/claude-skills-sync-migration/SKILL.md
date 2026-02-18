@@ -13,9 +13,10 @@ description: Scaffold reusable skill-sync automation for migrating repositories.
 
 1. 生成 `scripts/sync-llm-skills.ts`，支持 `--source`、`--targets`、`--dry-run`。
 2. 注入 `scripts.skills:sync:llm` 命令。
-3. 以幂等方式合并 `postinstall`，默认追加 `&& <runner> skills:sync:llm`。
-4. 同步目标同时支持 `.claude/skills` 与 `.codex/skills`。
-5. 同步过程采用原子切换，避免复制失败时清空目标目录。
+3. 自动确保 `devDependencies.is-ci` 存在（缺失时自动写入）。
+4. 以幂等方式合并 `postinstall`，默认注入 `is-ci` CI guard。
+5. 同步目标同时支持 `.claude/skills` 与 `.codex/skills`。
+6. 同步过程采用原子切换，避免复制失败时清空目标目录。
 
 ## Execution Flow
 
@@ -53,7 +54,8 @@ pnpm run skills:sync:llm -- --targets=codex
 - 列出新增/更新文件：
   - `scripts/sync-llm-skills.ts`
   - `package.json`
-- 说明 postinstall 合并结果（新建、追加、或已存在跳过）。
+- 说明 `is-ci` 依赖处理结果（新增或已存在）。
+- 说明 postinstall 合并结果（新建、追加、或已存在跳过），并标注 CI guard 是否生效。
 - 附上验证命令与执行结果。
 
 ## Resources
@@ -70,3 +72,4 @@ pnpm run skills:sync:llm -- --targets=codex
 4. 源目录不存在时必须失败并返回非零退出码。
 5. postinstall 去重必须做完整命令/完整脚本调用匹配，不能使用宽松子串匹配。
 6. 同步实现必须优先复制到临时目录，再切换目标目录，并在失败时尝试回滚。
+7. 若目标仓库缺少 `is-ci`，必须自动写入 `devDependencies.is-ci`，再注入 CI guard 命令。

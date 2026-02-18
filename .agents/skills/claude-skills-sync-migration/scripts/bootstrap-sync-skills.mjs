@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 const DEFAULT_SCRIPT_NAME = 'skills:sync:llm'
 const DEFAULT_SCRIPT_PATH = 'scripts/sync-llm-skills.ts'
 const DEFAULT_SCRIPT_COMMAND_PREFIX = 'node --experimental-strip-types'
+const DEFAULT_IS_CI_VERSION = '^4.1.0'
 const SCRIPT_NAME_PATTERN = /^[A-Za-z0-9:._-]+$/
 
 function printHelp() {
@@ -161,6 +162,44 @@ function validateScriptName(scriptName) {
   }
 }
 
+function getOptionalObjectRecord(packageJson, key) {
+  const value = packageJson[key]
+
+  if (value === undefined) {
+    return null
+  }
+
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`package.json field "${key}" must be an object when it exists`)
+  }
+
+  return value
+}
+
+function ensureObjectRecord(packageJson, key) {
+  const existing = getOptionalObjectRecord(packageJson, key)
+  if (existing) {
+    return existing
+  }
+
+  const initialized = {}
+  packageJson[key] = initialized
+  return initialized
+}
+
+function ensureIsCiDependency(packageJson) {
+  const dependencies = getOptionalObjectRecord(packageJson, 'dependencies')
+  const devDependencies = getOptionalObjectRecord(packageJson, 'devDependencies')
+
+  if (dependencies?.['is-ci'] || devDependencies?.['is-ci']) {
+    return { added: false }
+  }
+
+  const writableDevDependencies = ensureObjectRecord(packageJson, 'devDependencies')
+  writableDevDependencies['is-ci'] = DEFAULT_IS_CI_VERSION
+  return { added: true }
+}
+
 async function loadPackageJson(projectRoot) {
   const packageJsonPath = path.join(projectRoot, 'package.json')
   const raw = await readFile(packageJsonPath, 'utf8').catch(() => null)
@@ -245,7 +284,7 @@ function mergePostinstallScript(currentPostinstall, command, scriptName) {
     return currentPostinstall
   }
 
-  return `${currentPostinstall} && ${command}`
+  return `${currentPostinstall} && (${command})`
 }
 
 async function main() {
@@ -261,6 +300,7 @@ async function main() {
   )
 
   const { packageJson, packageJsonPath } = await loadPackageJson(projectRoot)
+  const { added: isCiAdded } = ensureIsCiDependency(packageJson)
   const scripts = packageJson.scripts && typeof packageJson.scripts === 'object'
     ? packageJson.scripts
     : {}
@@ -273,7 +313,7 @@ async function main() {
   let postinstallChanged = false
   if (!options.skipPostinstall) {
     const postinstallRunner = await resolvePackageRunner(projectRoot, packageJson.packageManager)
-    const postinstallCommand = `${postinstallRunner} ${options.scriptName}`
+    const postinstallCommand = `is-ci && echo 'Skipping ${options.scriptName} in CI environment' || ${postinstallRunner} ${options.scriptName}`
     const currentPostinstall = scripts.postinstall
 
     if (currentPostinstall !== undefined && typeof currentPostinstall !== 'string') {
@@ -298,6 +338,9 @@ async function main() {
   )
   console.log(
     `[bootstrap-sync-skills] ${syncScriptChanged ? 'Set' : 'Kept'} script: ${options.scriptName} = "${syncCommand}"`,
+  )
+  console.log(
+    `[bootstrap-sync-skills] ${isCiAdded ? 'Added' : 'Kept'} devDependency: is-ci`,
   )
 
   if (options.skipPostinstall) {
